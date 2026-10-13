@@ -3,7 +3,11 @@ import { test } from 'node:test'
 import { createServer } from 'vite'
 
 test('GIF export preserves transparency and clears previous frames', async () => {
-  const server = await createServer({ server: { middlewareMode: true }, ssr: { noExternal: ['gifenc'] } })
+  const server = await createServer({
+    server: { middlewareMode: true },
+    optimizeDeps: { noDiscovery: true },
+    ssr: { noExternal: ['gifenc'] },
+  })
   const oldBitmap = globalThis.createImageBitmap
   const oldDocument = globalThis.document
   try {
