@@ -3,3 +3,6 @@ dist/
 *.tsbuildinfo
 .playwright-mcp/
 .cert/
+
+# Local Netlify folder
+.netlify
