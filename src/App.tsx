@@ -7,7 +7,8 @@ type Session = { template: Template; stream: MediaStream }
 export function App() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
-  const [camera, setCamera] = useState<'checking' | 'available' | 'unavailable'>('checking')
+  const [camera, setCamera] = useState<'available' | 'unavailable' | 'insecure'>(() =>
+    !window.isSecureContext ? 'insecure' : navigator.mediaDevices ? 'available' : 'unavailable')
   const [error, setError] = useState('')
   const [session, setSession] = useState<Session | null>(null)
   const [starting, setStarting] = useState(false)
@@ -15,10 +16,6 @@ export function App() {
   useEffect(() => {
     let active = true
     loadTemplates().then(items => { if (active) { setTemplates(items); setLoading(false) } })
-    if (!navigator.mediaDevices?.getUserMedia) { setCamera('unavailable'); return () => { active = false } }
-    navigator.mediaDevices.enumerateDevices()
-      .then(devices => { if (active) setCamera(devices.some(device => device.kind === 'videoinput') ? 'available' : 'unavailable') })
-      .catch(() => { if (active) setCamera('available') })
     return () => { active = false }
   }, [])
 
@@ -38,7 +35,9 @@ export function App() {
       setCamera('available')
     } catch (reason) {
       console.error('Camera unavailable:', reason)
-      setError('Camera access failed. Check your permissions and try again.')
+      if (reason instanceof DOMException && reason.name === 'NotFoundError') {
+        setCamera('unavailable')
+      } else setError('Camera access failed. Check your permissions and try again.')
     } finally { setStarting(false) }
   }
 
@@ -60,7 +59,7 @@ export function App() {
           <div className="card-footer"><div><h3>{template.title}</h3><p>{template.description}</p></div><button className="circle-button" type="button" aria-label={`Start ${template.title}`} disabled={camera !== 'available' || starting} onClick={() => void start(template)}>↗</button></div>
         </article>)}</div>}
       {camera === 'unavailable' && <p className="notice" role="alert">No camera detected. Connect a camera and refresh to start a template.</p>}
-      {camera === 'checking' && <p className="notice">Checking for a camera…</p>}
+      {camera === 'insecure' && <p className="notice" role="alert">Camera access requires HTTPS on phones. Open this site using a trusted HTTPS address instead of an HTTP LAN address.</p>}
       {error && <p className="notice" role="alert">{error}</p>}
     </section>
     <footer className="menu-footer"><span>MADE FOR THE MOMENT</span><span>YOUR PHOTOS STAY ON YOUR DEVICE ✳</span></footer>
