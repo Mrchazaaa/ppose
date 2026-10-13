@@ -7,6 +7,20 @@ export type ForegroundProcessor = (photo: Blob) => Promise<Blob>
 export const removePhotoBackground: ForegroundProcessor = photo =>
   removeBackground(photo, { model: 'isnet_quint8', device: 'cpu' })
 
+export function capturePhoto(video: HTMLVideoElement, width: number, height: number, mirrored: boolean): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  if (!context || !video.videoWidth) throw new Error('Camera is not ready yet')
+  const scale = Math.max(width / video.videoWidth, height / video.videoHeight)
+  const drawnWidth = video.videoWidth * scale
+  const drawnHeight = video.videoHeight * scale
+  if (mirrored) { context.translate(width, 0); context.scale(-1, 1) }
+  context.drawImage(video, (width - drawnWidth) / 2, (height - drawnHeight) / 2, drawnWidth, drawnHeight)
+  return new Promise((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('Could not capture photo')), 'image/png'))
+}
+
 async function pixels(blob: Blob, width: number, height: number): Promise<Uint8ClampedArray> {
   const image = await createImageBitmap(blob)
   try {

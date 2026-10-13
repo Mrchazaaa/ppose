@@ -13,8 +13,8 @@ export interface Template {
 
 type TemplateConfig = Omit<Template, 'guideWidth' | 'guideHeight'>
 
-const configs = import.meta.glob('../templates/*/config.json', { eager: true, import: 'default' })
-const images = import.meta.glob('../templates/*/*.{png,jpg,jpeg,webp,gif}', { eager: true, query: '?url', import: 'default' })
+const configs = import.meta.glob('../../templates/*/config.json', { eager: true, import: 'default' })
+const images = import.meta.glob('../../templates/*/*.{png,jpg,jpeg,webp,gif}', { eager: true, query: '?url', import: 'default' })
 
 export function parseTemplate(path: string, config: unknown, imageUrls: Record<string, string>): TemplateConfig {
   const data = config as Record<string, unknown>
@@ -31,10 +31,10 @@ export function parseTemplate(path: string, config: unknown, imageUrls: Record<s
       data.frames.some((frame: unknown, index: number) => frame !== `${index + 1}.png`)) {
     throw new Error(`${id}: invalid config (title, description, preview, duration, width, height, frames 1.png…50.png required)`)
   }
-  const preview = imageUrls[`../templates/${id}/${data.preview}`]
+  const preview = imageUrls[`../../templates/${id}/${data.preview}`]
   if (!preview) throw new Error(`${id}: missing preview ${data.preview}`)
   const guides = (data.frames as string[]).map(frame => {
-    const url = imageUrls[`../templates/${id}/${frame}`]
+    const url = imageUrls[`../../templates/${id}/${frame}`]
     if (!url) throw new Error(`${id}: missing guide ${frame}`)
     return url
   })

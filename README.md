@@ -42,6 +42,6 @@ Run `npm run guides:gif -- hello` to animate the numbered guide PNGs using the t
 
 ## Style guide
 
-Dark surfaces, mint accents, rounded cards and controls, and compact uppercase labels. Design tokens (colors, radius and font stack) live in `src/variables.css`; layouts and components use those tokens in `src/styles.css`. Reusable controls share `.button`, `.text-button`, and `.circle-button` styles. UI flows are split into menu (`App`), capture (`Capture`), and result (`Results`); template loading and image processing live outside the views.
+Dark surfaces, mint accents, rounded cards and controls, and compact uppercase labels. Design tokens (colors, radius and font stack) live in `src/variables.css`; layouts and components use those tokens in `src/styles.css`. `src/view/` renders the menu, capture, and results; `src/viewmodel/` manages their state and actions; `src/model/` loads templates and processes images. Reusable controls share `.button`, `.text-button`, and `.circle-button` styles.
 
 The background-removal dependency is AGPL-3.0. Check its license terms before distributing the app.

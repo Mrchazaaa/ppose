@@ -10,7 +10,7 @@ test('GIF export preserves transparency and clears previous frames', async () =>
   const oldBitmap = globalThis.createImageBitmap
   const oldDocument = globalThis.document
   try {
-    const { createGif } = await server.ssrLoadModule('/src/processing.ts')
+    const { createGif } = await server.ssrLoadModule('/src/model/processing.ts')
     globalThis.createImageBitmap = async blob => ({ data: new Uint8ClampedArray(await blob.arrayBuffer()), close() {} })
     globalThis.document = { createElement: () => ({
       getContext: () => ({ drawImage(image) { this.data = image.data }, getImageData() { return { data: this.data } } }),

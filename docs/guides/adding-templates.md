@@ -39,4 +39,4 @@ All guides in a template must have identical dimensions and fit within the speci
 
 Run `npm run guides:gif -- hello` to generate `templates/hello/guides.gif` from its numbered PNGs at the configured duration and resolution. Set `"preview": "guides.gif"` to use it as the homepage preview.
 
-An invalid configuration, missing guide, or guide of the wrong size prevents that template from loading. Check the browser console for the error. See [`src/templates.ts`](../../src/templates.ts) for the loader and validation rules.
+An invalid configuration, missing guide, or guide of the wrong size prevents that template from loading. Check the browser console for the error. See [`src/model/templates.ts`](../../src/model/templates.ts) for the loader and validation rules.

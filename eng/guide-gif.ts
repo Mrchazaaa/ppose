@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import pngjs from 'pngjs'
-import { encodeGif } from '../src/gif'
+import { encodeGif } from '../src/model/gif'
 
 async function main() {
   const id = process.argv[2]

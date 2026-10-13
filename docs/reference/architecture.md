@@ -4,12 +4,12 @@ ppose is a React and TypeScript client-side application. There is no backend: th
 
 ## App structure
 
-- [`src/App.tsx`](../../src/App.tsx) loads templates, presents the menu, requests camera access, and owns the active session.
-- [`src/Capture.tsx`](../../src/Capture.tsx) owns the capture, review, and results flow. Session frame state stays close to the views that use it rather than in a global store.
-- [`src/templates.ts`](../../src/templates.ts) bundles templates and validates their configuration and image dimensions.
-- [`src/processing.ts`](../../src/processing.ts) contains the foreground processor and GIF encoder. `ForegroundProcessor` is a function type that lets the capture flow use another removal implementation without changing the view.
+- [`src/view/App.tsx`](../../src/view/App.tsx) and [`src/view/Capture.tsx`](../../src/view/Capture.tsx) render the menu, capture, review, and results UI.
+- [`src/viewmodel/`](../../src/viewmodel/) contains React hooks for template selection, camera and frame state, and GIF export progress. Views call their actions and render their state.
+- [`src/model/templates.ts`](../../src/model/templates.ts) bundles templates and validates their configuration and image dimensions.
+- [`src/model/processing.ts`](../../src/model/processing.ts) captures and processes photos; [`src/model/gif.ts`](../../src/model/gif.ts) encodes GIFs for the app and guide-animation script.
 
-Views own their state and call processing functions for image work, following the project's MVVM separation in a lightweight way. Favor composition, reuse, and small boundaries over duplicated logic or tight coupling.
+Views contain JSX, viewmodels own workflow state and actions, and models handle template and image data. Session frame state stays in the capture viewmodel rather than a global store.
 
 ## Photo-to-GIF pipeline
 

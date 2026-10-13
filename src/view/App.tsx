@@ -1,47 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useAppViewModel } from '../viewmodel/useAppViewModel'
 import { Capture } from './Capture'
-import { loadTemplates, type Template } from './templates'
-
-type Session = { template: Template; stream: MediaStream }
 
 export function App() {
-  const [templates, setTemplates] = useState<Template[]>([])
-  const [loading, setLoading] = useState(true)
-  const [camera, setCamera] = useState<'available' | 'unavailable' | 'insecure'>(() =>
-    !window.isSecureContext ? 'insecure' : navigator.mediaDevices ? 'available' : 'unavailable')
-  const [error, setError] = useState('')
-  const [session, setSession] = useState<Session | null>(null)
-  const [starting, setStarting] = useState(false)
+  const { templates, loading, camera, error, session, starting, start, close } = useAppViewModel()
 
-  useEffect(() => {
-    let active = true
-    loadTemplates().then(items => { if (active) { setTemplates(items); setLoading(false) } })
-    return () => { active = false }
-  }, [])
-
-  useEffect(() => {
-    if (!session) return
-    return () => session.stream.getTracks().forEach(track => track.stop())
-  }, [session])
-
-  async function start(template: Template) {
-    setStarting(true)
-    setError('')
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false, video: { facingMode: 'user', width: { ideal: template.width }, height: { ideal: template.height } },
-      })
-      setSession({ template, stream })
-      setCamera('available')
-    } catch (reason) {
-      console.error('Camera unavailable:', reason)
-      if (reason instanceof DOMException && reason.name === 'NotFoundError') {
-        setCamera('unavailable')
-      } else setError('Camera access failed. Check your permissions and try again.')
-    } finally { setStarting(false) }
-  }
-
-  if (session) return <Capture template={session.template} stream={session.stream} onClose={() => setSession(null)} />
+  if (session) return <Capture template={session.template} stream={session.stream} onClose={close} />
 
   return <main className="menu shell">
     <header className="masthead"><a className="brand" href="/" aria-label="ppose home">p<span>p</span>ose<span className="brand-dot">.</span></a><span className="privacy-note">YOUR PHOTOS STAY ON YOUR DEVICE ✳</span></header>
