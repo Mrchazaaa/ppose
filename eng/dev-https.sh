@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
+# Example: ./eng/dev-https.sh (or ./eng/dev-https.sh 192.168.1.227 to choose an IP)
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
-ip="${1:?Usage: npm run dev:https -- YOUR_PHONE_REACHABLE_LAN_IP}"
+ip="${1:-}"
+if [[ -z "$ip" ]]; then
+  route=$(ip -4 route get 1.1.1.1 2>/dev/null) && [[ $route =~ [[:space:]]src[[:space:]]([0-9.]+) ]] || {
+    echo 'Could not determine local IP; pass your phone-reachable LAN IP as an argument.' >&2
+    exit 1
+  }
+  ip="${BASH_REMATCH[1]}"
+fi
 mkdir -p .cert
 
 if [[ ! -f .cert/local-ca.key ]]; then

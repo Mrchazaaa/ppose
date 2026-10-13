@@ -8,7 +8,7 @@ Requires Node.js 20+. Run `npm ci` and `npm run dev`, then open `http://localhos
 
 To use the camera on a phone while testing locally:
 
-1. Stop any server already using port 5173. On the computer, find its Wi-Fi LAN IP (`hostname -I` on Linux), then run `npm run dev:https -- YOUR_LAN_IP` (for example, `npm run dev:https -- 192.168.1.227`). Use the IP of the network shared with the phone.
+1. Stop any server already using port 5173, then run `./eng/dev-https.sh` (or `npm run dev:https`). The script selects the IP of the default network route. If your phone is on a different network, supply its reachable LAN IP instead: `./eng/dev-https.sh YOUR_LAN_IP` (for example, `./eng/dev-https.sh 192.168.1.227`).
 2. Transfer **only** `.cert/local-ca.crt` (Android) or `.cert/local-ca.cer` (iPhone) to your phone and install it as a trusted certificate authority. On iPhone, after installing the profile, enable full trust under Settings → General → About → Certificate Trust Settings. Keep `.cert/local-ca.key` private.
 3. On the phone, open `https://YOUR_LAN_IP:5173/` in its browser. The exact IP supplied in step 1 must match the address in the URL. If the browser reports a certificate warning, check that the CA is trusted before using the camera.
 
