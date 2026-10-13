@@ -1,0 +1,8 @@
+{
+  "title": "Hello, you!",
+  "description": "A little wave in four frames.",
+  "duration": 320,
+  "width": 480,
+  "height": 600,
+  "frames": ["1.png", "2.png", "3.png", "4.png"]
+}
