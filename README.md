@@ -4,7 +4,7 @@ Make a transparent animated GIF of yourself, entirely in your browser.
 
 ## Run locally
 
-Requires Node.js 20+. Run `npm ci` and `npm run dev`, then open the local URL. From another machine on the home network, `http://mrchazaaa-asus-laptop:5173/` works if the hostname resolves, but **the camera cannot work over HTTP from a phone**.
+Requires Node.js 20+. Run `npm ci` and `npm run dev`, then open `http://localhost:5173/` on the computer running the server (use the port Vite prints if it changes). A LAN HTTP address such as `http://mrchazaaa-asus-laptop:5173/` can display the app but **cannot access the camera on any device**, including the host computer. Other devices need trusted HTTPS.
 
 To use the camera on a phone while testing locally:
 

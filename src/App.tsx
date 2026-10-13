@@ -59,7 +59,7 @@ export function App() {
           <div className="card-footer"><div><h3>{template.title}</h3><p>{template.description}</p></div><button className="circle-button" type="button" aria-label={`Start ${template.title}`} disabled={camera !== 'available' || starting} onClick={() => void start(template)}>↗</button></div>
         </article>)}</div>}
       {camera === 'unavailable' && <p className="notice" role="alert">No camera detected. Connect a camera and refresh to start a template.</p>}
-      {camera === 'insecure' && <p className="notice" role="alert">Camera access requires HTTPS on phones. Open this site using a trusted HTTPS address instead of an HTTP LAN address.</p>}
+      {camera === 'insecure' && <p className="notice" role="alert">Camera access needs a secure address on every device. On the computer running ppose, open <a href={`http://localhost:${window.location.port || '5173'}/`}>http://localhost:{window.location.port || '5173'}/</a>. On other devices, use trusted HTTPS.</p>}
       {error && <p className="notice" role="alert">{error}</p>}
     </section>
     <footer className="menu-footer"><span>MADE FOR THE MOMENT</span><span>YOUR PHOTOS STAY ON YOUR DEVICE ✳</span></footer>
