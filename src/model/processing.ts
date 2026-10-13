@@ -4,8 +4,27 @@ import type { Template } from './templates'
 
 // The foreground processor can be replaced without changing the capture flow.
 export type ForegroundProcessor = (photo: Blob) => Promise<Blob>
-export const removePhotoBackground: ForegroundProcessor = photo =>
-  removeBackground(photo, { model: 'isnet_quint8', device: 'cpu' })
+let device: 'gpu' | 'cpu' = 'gpu'
+export const removePhotoBackground: ForegroundProcessor = async photo => {
+  try {
+    return await removeBackground(photo, { model: 'isnet_quint8', device })
+  } catch (error) {
+    if (device === 'cpu') throw error
+    device = 'cpu'
+    return removeBackground(photo, { model: 'isnet_quint8', device })
+  }
+}
+
+export async function processPhotos(frames: Blob[], process: ForegroundProcessor, onProgress: (done: number) => void, signal: AbortSignal): Promise<Blob[]> {
+  const processed: Blob[] = []
+  for (const frame of frames) {
+    if (signal.aborted) throw new DOMException('Processing cancelled', 'AbortError')
+    processed.push(await process(frame))
+    if (signal.aborted) throw new DOMException('Processing cancelled', 'AbortError')
+    onProgress(processed.length)
+  }
+  return processed
+}
 
 export function capturePhoto(video: HTMLVideoElement, width: number, height: number, mirrored: boolean): Promise<Blob> {
   const canvas = document.createElement('canvas')

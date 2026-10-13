@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { capturePhoto, removePhotoBackground, type ForegroundProcessor } from '../model/processing'
+import { capturePhoto } from '../model/processing'
 import type { Template } from '../model/templates'
 
-type Frame = { original: Blob; url: string; processed?: Blob }
+type Frame = { original: Blob; url: string; accepted: boolean }
 
-export function useCaptureViewModel(template: Template, stream: MediaStream, process: ForegroundProcessor = removePhotoBackground) {
+export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const video = useRef<HTMLVideoElement>(null)
   const urls = useRef(new Set<string>())
   const alive = useRef(true)
@@ -17,7 +17,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream, pro
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
   const current = frames[index]
-  const completed = frames.filter(frame => frame?.processed).length
+  const completed = frames.filter(frame => frame?.accepted).length
   const mirrored = stream.getVideoTracks()[0]?.getSettings().facingMode !== 'environment'
 
   useEffect(() => {
@@ -61,26 +61,19 @@ export function useCaptureViewModel(template: Template, stream: MediaStream, pro
       const url = URL.createObjectURL(blob)
       urls.current.add(url)
       if (frames[index]) { URL.revokeObjectURL(frames[index]!.url); urls.current.delete(frames[index]!.url) }
-      setFrames(previous => previous.map((frame, position) => position === index ? { original: blob, url } : frame))
+      setFrames(previous => previous.map((frame, position) => position === index ? { original: blob, url, accepted: false } : frame))
       setMode('review')
     } catch (reason) { setError(String(reason)) }
     finally { if (alive.current) setBusy(false) }
   }
 
-  async function accept() {
+  function accept() {
     if (!current || busy) return
-    setBusy(true)
     setError('')
-    try {
-      const processed = await process(current.original)
-      if (!alive.current) return
-      setFrames(previous => previous.map((frame, position) => position === index && frame === current ? { ...frame, processed } : frame))
-      const next = frames.findIndex((frame, position) => position !== index && !frame?.processed)
-      if (next !== -1) { setIndex(next); setMode('camera') }
-    } catch (reason) {
-      console.error('Background removal failed:', reason)
-      if (alive.current) setError('Background removal failed. Your photo is saved; try accepting it again.')
-    } finally { if (alive.current) setBusy(false) }
+    setFrames(previous => previous.map((frame, position) => position === index ? { ...frame!, accepted: true } : frame))
+    const next = frames.findIndex((frame, position) => position !== index && !frame?.accepted)
+    if (next !== -1) { setIndex(next); setMode('camera') }
+    else { stream.getTracks().forEach(track => track.stop()); setMode('results') }
   }
 
   function select(position: number) {
@@ -99,15 +92,9 @@ export function useCaptureViewModel(template: Template, stream: MediaStream, pro
     setMode('camera')
   }
 
-  function continueCapture() {
-    const next = frames.findIndex(frame => !frame?.processed)
-    if (next !== -1) select(next)
-    else { stream.getTracks().forEach(track => track.stop()); setMode('results') }
-  }
-
   function chooseTimer(seconds: number) { setTimer(seconds); setCountdown(0) }
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
 
   return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady,
-    current, completed, mirrored, chooseTimer, shoot, accept, select, retake, continueCapture }
+    current, completed, mirrored, chooseTimer, shoot, accept, select, retake }
 }

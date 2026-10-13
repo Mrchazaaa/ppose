@@ -1,6 +1,6 @@
 import * as gifenc from 'gifenc'
 
-const { applyPalette, GIFEncoder, quantize } = 'default' in gifenc ? gifenc.default : gifenc
+const { applyPalette, GIFEncoder, quantize } = typeof gifenc.default === 'function' ? gifenc : gifenc.default
 
 export async function encodeGif(frames: AsyncIterable<Uint8Array | Uint8ClampedArray>, width: number, height: number, duration: number, onProgress: (done: number) => void, signal?: AbortSignal): Promise<Blob> {
   const gif = GIFEncoder()

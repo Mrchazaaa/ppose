@@ -2,6 +2,26 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { createServer } from 'vite'
 
+test('final processing removes backgrounds in frame order and can retry after failure', async () => {
+  const server = await createServer({ server: { middlewareMode: true }, optimizeDeps: { noDiscovery: true } })
+  try {
+    const { processPhotos } = await server.ssrLoadModule('/src/model/processing.ts')
+    const photos = [new Blob(['first']), new Blob(['second'])]
+    const progress = []
+    let failed = false
+    const process = async photo => {
+      if (photo === photos[1] && !failed) { failed = true; throw new Error('Temporary failure') }
+      return new Blob([await photo.text(), '-transparent'])
+    }
+    await assert.rejects(processPhotos(photos, process, done => progress.push(done), new AbortController().signal), /Temporary failure/)
+    assert.deepEqual(progress, [1])
+    progress.length = 0
+    const result = await processPhotos(photos, process, done => progress.push(done), new AbortController().signal)
+    assert.deepEqual(await Promise.all(result.map(photo => photo.text())), ['first-transparent', 'second-transparent'])
+    assert.deepEqual(progress, [1, 2])
+  } finally { await server.close() }
+})
+
 test('GIF export preserves transparency and clears previous frames', async () => {
   const server = await createServer({
     server: { middlewareMode: true },

@@ -15,8 +15,8 @@ Views contain JSX, viewmodels own workflow state and actions, and models handle 
 
 1. The menu requests a video-only camera stream when a template starts. If a camera is unavailable or permission is denied, capture cannot begin.
 2. Capture displays a centered pose guide above the live preview. A camera frame is cropped to fill the template's output dimensions; front-facing captures are mirrored to match the preview.
-3. The original photo is kept for review, retakes, and retrying a failed background-removal attempt. Accepting a photo runs `@imgly/background-removal` locally with the quantized ISNet model. The guide helps positioning; segmentation identifies the person.
-4. Once all frames are processed, `gifenc` converts them in order at the template's configured frame duration. The encoder uses one-bit transparency and produces a GIF `Blob` for preview and download.
+3. Original photos are kept for review and retakes. Accepting a photo moves to the next frame without processing it. Once all photos are accepted, final processing runs `@imgly/background-removal` locally on each original with the quantized ISNet model. The guide helps positioning; segmentation identifies the person.
+4. Once all frames are processed, `gifenc` converts them in order at the template's configured frame duration. The encoder uses one-bit transparency and produces a GIF `Blob` for preview and download. Failed final processing can be retried from the saved originals.
 5. Leaving the session stops camera tracks and revokes temporary object URLs. GIF export reports progress and can be retried after failure.
 
 Background-removal model and WASM assets are downloaded on first use and cached by the browser. Check performance, edge quality, and offline reuse on the target devices; first-use processing can be slow.

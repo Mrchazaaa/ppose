@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
-import { createGif } from '../model/processing'
+import { useEffect, useRef, useState } from 'react'
+import { createGif, processPhotos, removePhotoBackground, type ForegroundProcessor } from '../model/processing'
 import type { Template } from '../model/templates'
 
-export function useResultsViewModel(template: Template, frames: Blob[]) {
+export function useResultsViewModel(template: Template, frames: Blob[], process: ForegroundProcessor = removePhotoBackground) {
+  const processedFrames = useRef<Blob[] | null>(null)
   const [url, setUrl] = useState('')
   const [progress, setProgress] = useState(0)
+  const [stage, setStage] = useState<'background' | 'gif'>('background')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
 
@@ -12,12 +14,28 @@ export function useResultsViewModel(template: Template, frames: Blob[]) {
     let active = true
     let objectUrl = ''
     const controller = new AbortController()
-    createGif(frames, template, done => { if (active) setProgress(done) }, controller.signal)
-      .then(blob => { if (active) { objectUrl = URL.createObjectURL(blob); setUrl(objectUrl) } })
-      .catch(reason => { if (active) { console.error('GIF export failed:', reason); setError('Could not create the GIF. Please try again.') } })
+    async function run() {
+      let encoding = false
+      try {
+        const processed = processedFrames.current ?? await processPhotos(frames, process, done => { if (active) setProgress(done) }, controller.signal)
+        if (!active) return
+        processedFrames.current = processed
+        setStage('gif')
+        setProgress(0)
+        encoding = true
+        const blob = await createGif(processed, template, done => { if (active) setProgress(done) }, controller.signal)
+        if (active) { objectUrl = URL.createObjectURL(blob); setUrl(objectUrl) }
+      } catch (reason) {
+        if (active) {
+          console.error('Final processing failed:', reason)
+          setError(encoding ? 'Could not create the GIF. Please try again.' : 'Could not remove backgrounds. Please try again.')
+        }
+      }
+    }
+    void run()
     return () => { active = false; controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl) }
-  }, [frames, template, attempt])
+  }, [frames, template, process, attempt])
 
-  function retry() { setError(''); setProgress(0); setAttempt(value => value + 1) }
-  return { url, progress, error, retry }
+  function retry() { setError(''); setStage('background'); setProgress(0); setAttempt(value => value + 1) }
+  return { url, progress, stage, error, retry }
 }
