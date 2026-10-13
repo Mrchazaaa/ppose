@@ -44,7 +44,6 @@ export function Capture({ template, stream, onClose, process = removePhotoBackgr
     return () => {
       alive.current = false
       track?.removeEventListener('ended', interrupted)
-      stream.getTracks().forEach(item => item.stop())
       urls.current.forEach(url => URL.revokeObjectURL(url))
     }
   }, [stream])
@@ -146,10 +145,11 @@ function Results({ template, frames, onClose }: { template: Template; frames: Bl
   useEffect(() => {
     let active = true
     let objectUrl = ''
-    createGif(frames, template, done => { if (active) setProgress(done) })
+    const controller = new AbortController()
+    createGif(frames, template, done => { if (active) setProgress(done) }, controller.signal)
       .then(blob => { if (active) { objectUrl = URL.createObjectURL(blob); setUrl(objectUrl) } })
-      .catch(reason => { console.error('GIF export failed:', reason); if (active) setError('Could not create the GIF. Please try again.') })
-    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl) }
+      .catch(reason => { if (active) { console.error('GIF export failed:', reason); setError('Could not create the GIF. Please try again.') } })
+    return () => { active = false; controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl) }
   }, [frames, template, attempt])
 
   return <main className="results shell"><header className="masthead"><span className="brand">p<span>p</span>ose<span className="brand-dot">.</span></span><button className="text-button" type="button" onClick={onClose}>✕ Close</button></header><section className="results-content"><div><span className="eyebrow">THE BIG REVEAL ✳</span><h1>You made <em>magic.</em></h1><p>Your moment, on repeat. Made entirely on your device.</p>{url ? <a className="button primary download" href={url} download={`${template.id}.gif`}>↓ Download GIF</a> : error ? <><p className="notice" role="alert">{error}</p><button className="button primary" type="button" onClick={() => { setError(''); setProgress(0); setAttempt(value => value + 1) }}>Try again</button></> : <p role="status">Creating your GIF… {progress}/{frames.length} frames</p>}</div><div className="result-preview">{url ? <img src={url} alt={`Animated GIF of ${template.title}`} /> : <div className="result-placeholder">✳</div>}<span>YOUR LOOP / {frames.length} FRAMES</span></div></section></main>

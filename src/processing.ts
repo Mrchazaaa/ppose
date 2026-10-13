@@ -22,10 +22,12 @@ async function pixels(blob: Blob, width: number, height: number): Promise<Uint8C
   }
 }
 
-export async function createGif(frames: Blob[], template: Template, onProgress: (done: number) => void): Promise<Blob> {
+export async function createGif(frames: Blob[], template: Template, onProgress: (done: number) => void, signal?: AbortSignal): Promise<Blob> {
   const gif = GIFEncoder()
   for (const [index, frame] of frames.entries()) {
+    if (signal?.aborted) throw new DOMException('GIF export cancelled', 'AbortError')
     const rgba = await pixels(frame, template.width, template.height)
+    if (signal?.aborted) throw new DOMException('GIF export cancelled', 'AbortError')
     // Reserve one palette entry for transparency; GIF has one-bit alpha.
     for (let i = 3; i < rgba.length; i += 4) rgba[i] = rgba[i] < 128 ? 0 : 255
     const palette = quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: true })

@@ -10,10 +10,12 @@ export interface Template {
   guides: string[]
 }
 
+type TemplateConfig = Omit<Template, 'guideWidth' | 'guideHeight'>
+
 const configs = import.meta.glob('../templates/*/config.json', { eager: true, import: 'default' })
 const images = import.meta.glob('../templates/*/*.png', { eager: true, query: '?url', import: 'default' })
 
-export function parseTemplate(path: string, config: unknown, imageUrls: Record<string, string>): Template {
+export function parseTemplate(path: string, config: unknown, imageUrls: Record<string, string>): TemplateConfig {
   const data = config as Record<string, unknown>
   const id = path.split('/').at(-2)!
   if (!data || typeof data.title !== 'string' || !data.title.trim() ||
@@ -33,7 +35,7 @@ export function parseTemplate(path: string, config: unknown, imageUrls: Record<s
     return url
   })
   return { id, title: data.title, description: data.description, duration: data.duration as number,
-    width: data.width as number, height: data.height as number, guideWidth: 0, guideHeight: 0, guides }
+    width: data.width as number, height: data.height as number, guides }
 }
 
 function dimensions(url: string): Promise<[number, number]> {

@@ -22,6 +22,11 @@ export function App() {
     return () => { active = false }
   }, [])
 
+  useEffect(() => {
+    if (!session) return
+    return () => session.stream.getTracks().forEach(track => track.stop())
+  }, [session])
+
   async function start(template: Template) {
     setStarting(true)
     setError('')
