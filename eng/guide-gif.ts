@@ -12,21 +12,25 @@ async function main() {
   const { frames, width, height, duration } = JSON.parse(await readFile(new URL('config.json', folder), 'utf8')) as {
     frames: string[]; width: number; height: number; duration: number
   }
-  if (!Number.isInteger(width) || width < 1 || width > 2048 ||
-      !Number.isInteger(height) || height < 1 || height > 2048 ||
-      !Number.isInteger(duration) || duration < 20 ||
-      !Array.isArray(frames) || frames.length < 1 || frames.length > 50 ||
-      frames.some((frame, index) => frame !== `${index + 1}.png`)) {
-    throw new Error(`${id}: invalid dimensions, duration, or frames in config.json`)
+  const problems: string[] = []
+  if (!Number.isInteger(width) || width < 1 || width > 2048) problems.push(`width must be an integer from 1 to 2048 (got ${width})`)
+  if (!Number.isInteger(height) || height < 1 || height > 2048) problems.push(`height must be an integer from 1 to 2048 (got ${height})`)
+  if (!Number.isInteger(duration) || duration < 20) problems.push(`duration must be an integer of at least 20 ms (got ${duration})`)
+  if (!Array.isArray(frames)) problems.push('frames must be an array of 1–100 PNG filenames')
+  else {
+    if (frames.length < 1 || frames.length > 100) problems.push(`frames must contain 1–100 entries (got ${frames.length})`)
+    const mismatch = frames.findIndex(frame => typeof frame !== 'string' || !/^[^/\\]+\.png$/.test(frame))
+    if (mismatch !== -1) problems.push(`frames[${mismatch}] must name a PNG in the template folder (got ${JSON.stringify(frames[mismatch])})`)
   }
+  if (problems.length) throw new Error(`${id}/config.json:\n- ${problems.join('\n- ')}`)
 
   async function* guides() {
     let size: [number, number] | undefined
     for (const frame of frames) {
-      const image = pngjs.PNG.sync.read(await readFile(new URL(frame, folder)))
+      const image = pngjs.PNG.sync.read(await readFile(new URL(encodeURIComponent(frame), folder)))
       if (image.width > width || image.height > height ||
           (size && (image.width !== size[0] || image.height !== size[1]))) {
-        throw new Error(`${id}: guides must share dimensions and fit within ${width}×${height}`)
+        throw new Error(`${id}/${frame}: guide is ${image.width}×${image.height}; guides must share dimensions and fit within ${width}×${height}`)
       }
       size = [image.width, image.height]
       const rgba = new Uint8Array(width * height * 4)
@@ -45,4 +49,4 @@ async function main() {
   console.log(`Created ${fileURLToPath(output)}`)
 }
 
-main().catch(error => { console.error(error); process.exitCode = 1 })
+main().catch(error => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1 })

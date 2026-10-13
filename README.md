@@ -22,7 +22,7 @@ Select a template, line up with each guide, take a photo immediately or after a 
 
 ## Add a template
 
-Create `templates/<id>/config.json` and numbered transparent PNG guides (`1.png`, `2.png`, etc.). The folder is picked up automatically at build time. For example:
+Create `templates/<id>/config.json` and transparent PNG guides. The folder is picked up automatically at build time. For example:
 
 ```json
 {
@@ -36,9 +36,9 @@ Create `templates/<id>/config.json` and numbered transparent PNG guides (`1.png`
 }
 ```
 
-`preview` names an image in the template folder (PNG, JPG, WebP, or GIF) for its homepage card; it can be separate from the pose guides. `duration` is milliseconds per GIF frame (at least 20). `width` and `height` are the capture/output resolution (up to 2048 each). The guides must be the same size, fit within that resolution, and are centered without scaling. Templates may have 1–50 ordered frames. Invalid templates are skipped with a console error.
+`preview` names an image in the template folder (PNG, JPG, WebP, or GIF) for its homepage card; it can be separate from the pose guides. `duration` is milliseconds per GIF frame (at least 20). `width` and `height` are the capture/output resolution (up to 2048 each). The guides must be the same size, fit within that resolution, and are centered without scaling. `frames` lists 1–100 PNG filenames in playback order; names can be repeated to hold a pose. Invalid templates are skipped with a console error.
 
-Run `npm run guides:gif -- hello` to animate the numbered guide PNGs using the template's dimensions and frame duration. It writes `templates/hello/guides.gif`; set `"preview": "guides.gif"` in its `config.json` to show that animation on the homepage.
+Run `npm run guides:gif -- hello` to animate the listed guide PNGs using the template's dimensions and frame duration. It writes `templates/hello/guides.gif`; set `"preview": "guides.gif"` in its `config.json` to show that animation on the homepage.
 
 ## Style guide
 

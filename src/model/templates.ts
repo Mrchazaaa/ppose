@@ -27,9 +27,9 @@ export function parseTemplate(path: string, config: unknown, imageUrls: Record<s
       !Number.isInteger(data.height) || (data.width as number) < 1 ||
       (data.height as number) < 1 || (data.width as number) > 2048 ||
       (data.height as number) > 2048 || !Array.isArray(data.frames) ||
-      data.frames.length < 1 || data.frames.length > 50 ||
-      data.frames.some((frame: unknown, index: number) => frame !== `${index + 1}.png`)) {
-    throw new Error(`${id}: invalid config (title, description, preview, duration, width, height, frames 1.png…50.png required)`)
+      data.frames.length < 1 || data.frames.length > 100 ||
+      data.frames.some((frame: unknown) => typeof frame !== 'string' || !/^[^/\\]+\.png$/.test(frame))) {
+    throw new Error(`${id}: invalid config (title, description, preview, duration, width, height, 1–100 local PNG frames required)`)
   }
   const preview = imageUrls[`../../templates/${id}/${data.preview}`]
   if (!preview) throw new Error(`${id}: missing preview ${data.preview}`)

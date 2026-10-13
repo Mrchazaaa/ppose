@@ -14,6 +14,15 @@ test('template preview resolves independently of pose guides', async () => {
       duration: 200, width: 480, height: 600, guides: ['/1.png'],
     })
     assert.throws(() => parseTemplate(path, { ...config, preview: 'missing.png' }, images), /missing preview/)
+    const ordered = ['wave.png', 'rest.png', 'wave.png']
+    const namedImages = { '../../templates/example/wave.png': '/wave.png', '../../templates/example/rest.png': '/rest.png' }
+    assert.deepEqual(parseTemplate(path, { ...config, frames: ordered }, { ...images, ...namedImages }).guides,
+      ['/wave.png', '/rest.png', '/wave.png'])
+    assert.throws(() => parseTemplate(path, { ...config, frames: ['../outside.png'] }, images), /invalid config/)
+    const frames = Array.from({ length: 100 }, (_, index) => `${index + 1}.png`)
+    const frameImages = Object.fromEntries(frames.map(frame => [`../../templates/example/${frame}`, `/${frame}`]))
+    assert.equal(parseTemplate(path, { ...config, frames }, { ...images, ...frameImages }).guides.length, 100)
+    assert.throws(() => parseTemplate(path, { ...config, frames: [...frames, '101.png'] }, { ...images, ...frameImages }), /invalid config/)
   } finally {
     await server.close()
   }
