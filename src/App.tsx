@@ -49,7 +49,7 @@ export function App() {
       <div className="section-heading"><h1 id="templates-heading">Templates</h1><span className="section-note">More poses coming soon ↗</span></div>
       {loading ? <p>Loading templates…</p> : templates.length === 0 ? <p>No valid templates found. Check the console for details.</p> :
         <div className="template-grid">{templates.map(template => <article className="template-card" key={template.id}>
-          <div className="card-art"><img src={template.guides[0]} alt="" /><span className="card-frame">{template.guides.length} FRAMES</span></div>
+          <div className="card-art"><img src={template.preview} alt="" /><span className="card-frame">{template.guides.length} FRAMES</span></div>
           <div className="card-footer"><div><h3>{template.title}</h3><p>{template.description}</p></div><button className="circle-button" type="button" aria-label={`Start ${template.title}`} disabled={camera !== 'available' || starting} onClick={() => void start(template)}>↗</button></div>
         </article>)}</div>}
       {camera === 'unavailable' && <p className="notice" role="alert">No camera detected. Connect a camera and refresh to start a template.</p>}

@@ -2,6 +2,7 @@ export interface Template {
   id: string
   title: string
   description: string
+  preview: string
   duration: number
   width: number
   height: number
@@ -13,12 +14,13 @@ export interface Template {
 type TemplateConfig = Omit<Template, 'guideWidth' | 'guideHeight'>
 
 const configs = import.meta.glob('../templates/*/config.json', { eager: true, import: 'default' })
-const images = import.meta.glob('../templates/*/*.png', { eager: true, query: '?url', import: 'default' })
+const images = import.meta.glob('../templates/*/*.{png,jpg,jpeg,webp,gif}', { eager: true, query: '?url', import: 'default' })
 
 export function parseTemplate(path: string, config: unknown, imageUrls: Record<string, string>): TemplateConfig {
   const data = config as Record<string, unknown>
   const id = path.split('/').at(-2)!
   if (!data || typeof data.title !== 'string' || !data.title.trim() ||
+      typeof data.preview !== 'string' || !data.preview.trim() ||
       typeof data.description !== 'string' || !Number.isInteger(data.duration) ||
       (data.duration as number) < 20 || typeof data.width !== 'number' ||
       typeof data.height !== 'number' || !Number.isInteger(data.width) ||
@@ -27,14 +29,16 @@ export function parseTemplate(path: string, config: unknown, imageUrls: Record<s
       (data.height as number) > 2048 || !Array.isArray(data.frames) ||
       data.frames.length < 1 || data.frames.length > 50 ||
       data.frames.some((frame: unknown, index: number) => frame !== `${index + 1}.png`)) {
-    throw new Error(`${id}: invalid config (title, description, duration, width, height, frames 1.png…50.png required)`)
+    throw new Error(`${id}: invalid config (title, description, preview, duration, width, height, frames 1.png…50.png required)`)
   }
+  const preview = imageUrls[`../templates/${id}/${data.preview}`]
+  if (!preview) throw new Error(`${id}: missing preview ${data.preview}`)
   const guides = (data.frames as string[]).map(frame => {
     const url = imageUrls[`../templates/${id}/${frame}`]
     if (!url) throw new Error(`${id}: missing guide ${frame}`)
     return url
   })
-  return { id, title: data.title, description: data.description, duration: data.duration as number,
+  return { id, title: data.title, description: data.description, preview, duration: data.duration as number,
     width: data.width as number, height: data.height as number, guides }
 }
 

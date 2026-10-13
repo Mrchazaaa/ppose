@@ -18,6 +18,7 @@ Example `config.json`:
 {
   "title": "Hello, you!",
   "description": "A little wave in four frames.",
+  "preview": "2.png",
   "duration": 320,
   "width": 480,
   "height": 600,
@@ -29,10 +30,13 @@ Example `config.json`:
 | --- | --- |
 | `title` | Nonempty name displayed in the menu and studio. |
 | `description` | Text displayed on the template card. |
+| `preview` | Image in the template folder displayed on the homepage card (PNG, JPG, WebP, or GIF); can be separate from the guides. |
 | `duration` | Milliseconds per GIF frame; integer of at least 20. |
 | `width`, `height` | Capture and output resolution in pixels; integers from 1 to 2048. |
 | `frames` | Ordered list of 1–50 guides, named consecutively `1.png`, `2.png`, and so on. |
 
 All guides in a template must have identical dimensions and fit within the specified output resolution. They are centered horizontally and vertically over the camera view without scaling. Design each guide for the pose to be photographed in its corresponding frame; a guide helps with alignment but is not a background-removal mask.
+
+Run `npm run guides:gif -- hello` to generate `templates/hello/guides.gif` from its numbered PNGs at the configured duration and resolution. Set `"preview": "guides.gif"` to use it as the homepage preview.
 
 An invalid configuration, missing guide, or guide of the wrong size prevents that template from loading. Check the browser console for the error. See [`src/templates.ts`](../../src/templates.ts) for the loader and validation rules.

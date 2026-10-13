@@ -8,4 +8,6 @@ declare module 'gifenc' {
     finish(): void
     bytes(): Uint8Array
   }
+  const gifenc: { quantize: typeof quantize; applyPalette: typeof applyPalette; GIFEncoder: typeof GIFEncoder }
+  export default gifenc
 }
