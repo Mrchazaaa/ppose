@@ -18,7 +18,7 @@ The `.cert/` directory is generated locally and git-ignored. Run `npm run build`
 
 In Netlify, choose **Add new project → Import an existing project**, connect this GitHub repository, and select the `master` branch. `netlify.toml` runs the tests and production build, then publishes `dist/`. Once connected, pushes to `master` deploy automatically; pull requests get deploy previews. Netlify supplies HTTPS, so cameras work without the local certificate.
 
-Select a template, line up with each guide, take a photo immediately or after a 3/5/10-second timer, and accept or retake it. Click earlier frames to review or replace them. When all frames are accepted, make and download your GIF. Photos are held only in memory until you exit; no photos are uploaded. The background-removal library downloads its model and WASM assets on first use and caches them in the browser. The quantized model is roughly 40 MB, so initial processing can take a while; subsequent runs can use cached assets offline. GIF transparency is one-bit (edges cannot be partially transparent).
+Select a template, line up with each guide, take a photo immediately or after a 3/5/10-second timer, and accept or retake it. Click earlier frames to review or replace them. When all frames are accepted, make and download your GIF with the original photo backgrounds. Photos are held only in memory until you exit; no photos are uploaded.
 
 ## Add a template
 
@@ -44,4 +44,4 @@ Run `npm run guides:gif -- hello` to animate the listed guide PNGs using the tem
 
 Dark surfaces, mint accents, rounded cards and controls, and compact uppercase labels. Design tokens (colors, radius and font stack) live in `src/variables.css`; layouts and components use those tokens in `src/styles.css`. `src/view/` renders the menu, capture, and results; `src/viewmodel/` manages their state and actions; `src/model/` loads templates and processes images. Reusable controls share `.button`, `.text-button`, and `.circle-button` styles.
 
-The background-removal dependency is AGPL-3.0. Check its license terms before distributing the app.
+Background removal is temporarily disabled. Set `REMOVE_BACKGROUNDS` to `true` in `src/viewmodel/useResultsViewModel.ts` to enable it again. The background-removal dependency is AGPL-3.0. Check its license terms before distributing the app.

@@ -22,7 +22,7 @@ test('final processing removes backgrounds in frame order and can retry after fa
   } finally { await server.close() }
 })
 
-test('GIF export preserves transparency and clears previous frames', async () => {
+test('GIF export preserves opaque backgrounds and clears transparent frames', async () => {
   const server = await createServer({
     server: { middlewareMode: true },
     optimizeDeps: { noDiscovery: true },
@@ -47,6 +47,10 @@ test('GIF export preserves transparency and clears previous frames', async () =>
     assert.deepEqual(progress, [1, 2])
     const flags = [...bytes].flatMap((byte, i) => byte === 0x21 && bytes[i + 1] === 0xf9 ? [bytes[i + 3]] : [])
     assert.deepEqual(flags, [9, 9]) // disposal method 2 + transparency bit on both frames
+    const opaque = new Blob([new Uint8Array(Array.from({ length: 16 }, () => [255, 0, 0, 255]).flat())])
+    const originalGif = await createGif([opaque], { width: 4, height: 4, duration: 200 }, () => {})
+    const originalBytes = new Uint8Array(await originalGif.arrayBuffer())
+    assert.deepEqual([...originalBytes].flatMap((byte, i) => byte === 0x21 && originalBytes[i + 1] === 0xf9 ? [originalBytes[i + 3]] : []), [8]) // opaque background stays opaque
   } finally {
     globalThis.createImageBitmap = oldBitmap
     globalThis.document = oldDocument

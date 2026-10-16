@@ -36,8 +36,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
     if (mode !== 'camera' || !video.current) return
     const element = video.current
     element.srcObject = stream
-    void element.play().catch(() => setError('Unable to start camera preview.'))
-    return () => { element.srcObject = null }
+    return () => { setReady(false); element.srcObject = null }
   }, [mode, stream])
 
   useEffect(() => {
@@ -95,6 +94,6 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   function chooseTimer(seconds: number) { setTimer(seconds); setCountdown(0) }
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
 
-  return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady,
+  return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
     current, completed, mirrored, chooseTimer, shoot, accept, select, retake }
 }

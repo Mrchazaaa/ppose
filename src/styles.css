@@ -44,7 +44,6 @@ h1 em { font-style: normal; color: var(--accent); }
 .studio-sidebar { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
 .studio-exit { align-self: start; margin-bottom: 16px; }
 .studio-info { flex: 0 0 auto; }
-.studio-info h1 { font-size: clamp(34px, 3.5vw, 52px); line-height: 1.05; letter-spacing: -.065em; margin: 20px 0; }
 .studio-info p { color: var(--muted); line-height: 1.6; font-size: 15px; }
 .step-label { margin-top: 24px; color: var(--accent); }
 .step-label span { color: var(--muted); }
@@ -85,13 +84,13 @@ h1 em { font-style: normal; color: var(--accent); }
 @keyframes turn { to { transform: rotate(360deg); } }
 @media (max-width: 900px) {
   .studio-layout { grid-template-columns: 190px minmax(0, 1fr); gap: 16px; }
-  .studio-info h1 { margin: 10px 0; }.studio-info p { margin-bottom: 12px; }.step-label { margin: 0 0 12px; }
+  .studio-info p { margin-bottom: 12px; }.step-label { margin: 0 0 12px; }
 }
 @media (max-width: 600px) {
   .shell { padding: 0 20px; }.masthead { height: 74px; }.section-note { display: none; }
   .studio { padding: 0 10px; }
   .studio-layout { grid-template-columns: 104px minmax(0, 1fr); gap: 8px; padding: 8px 0; }
-  .studio-info h1 { font-size: 21px; }.studio-info p { display: none; }.studio-info .eyebrow { font-size: 9px; }.step-label { font-size: 9px; }
+  .studio-info p { display: none; }.step-label { font-size: 9px; }
   .capture-controls { grid-template-rows: auto 64px auto; gap: 10px; padding: 14px 0; }.capture-controls .button { font-size: 12px; }.control-hint { font-size: 9px; min-height: 40px; }
   .shutter { width: 64px; height: 64px; }.timeline { justify-content: center; gap: 6px; }.timeline-frame { width: 74px; height: 68px; }
   .results-content { grid-template-columns: 1fr; padding: 45px 0; gap: 30px; }.results h1 { margin: 20px 0; }
