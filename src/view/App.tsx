@@ -1,10 +1,10 @@
-import { useAppViewModel } from '../viewmodel/useAppViewModel'
-import { Capture } from './Capture'
+import type { useAppViewModel } from '../viewmodel/useAppViewModel'
+import { CaptureSession } from '../CaptureSession'
 
-export function App() {
-  const { templates, loading, camera, error, session, starting, start, close } = useAppViewModel()
+export function App({ viewModel }: { viewModel: ReturnType<typeof useAppViewModel> }) {
+  const { templates, loading, camera, error, session, starting, start, close } = viewModel
 
-  if (session) return <Capture template={session.template} stream={session.stream} onClose={close} />
+  if (session) return <CaptureSession template={session.template} stream={session.stream} onClose={close} />
 
   return <main className="menu shell">
     <header className="masthead"><a className="brand" href="/" aria-label="ppose home">p<span>p</span>ose<span className="brand-dot">.</span></a><span className="privacy-note">YOUR PHOTOS STAY ON YOUR DEVICE ✳</span></header>

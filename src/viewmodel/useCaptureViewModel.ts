@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
-import { capturePhoto } from '../model/processing'
-import type { Template } from '../model/templates'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { capturePhoto, type ForegroundProcessor } from '../model/processing'
+import { withAspectRatio, type Template } from '../model/templates'
 
 type Frame = { original: Blob; url: string; accepted: boolean }
 
-export function useCaptureViewModel(template: Template, stream: MediaStream) {
+export function useCaptureViewModel(template: Template, stream: MediaStream, onClose: () => void, process?: ForegroundProcessor) {
   const video = useRef<HTMLVideoElement>(null)
   const urls = useRef(new Set<string>())
   const alive = useRef(true)
@@ -16,6 +16,9 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
+  const [aspect, setAspect] = useState('original')
+  const captureTemplate = useMemo(() => aspect === 'original' ? template : withAspectRatio(template, Number(aspect)), [template, aspect])
+  const resultFrames = useMemo(() => mode === 'results' ? frames.map(frame => frame!.original) : [], [frames, mode])
   const current = frames[index]
   const completed = frames.filter(frame => frame?.accepted).length
   const mirrored = stream.getVideoTracks()[0]?.getSettings().facingMode !== 'environment'
@@ -55,7 +58,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
     setBusy(true)
     setError('')
     try {
-      const blob = await capturePhoto(video.current, template.width, template.height, mirrored)
+      const blob = await capturePhoto(video.current, captureTemplate.width, captureTemplate.height, mirrored)
       if (!alive.current) return
       const url = URL.createObjectURL(blob)
       urls.current.add(url)
@@ -95,5 +98,6 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
 
   return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
-    current, completed, mirrored, chooseTimer, shoot, accept, select, retake }
+    current, completed, mirrored, chooseTimer, shoot, accept, select, retake, aspect, setAspect,
+    template, captureTemplate, resultFrames, onClose, process }
 }

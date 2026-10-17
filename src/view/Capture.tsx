@@ -1,19 +1,13 @@
-import { useState, type CSSProperties } from 'react'
-import { useCaptureViewModel } from '../viewmodel/useCaptureViewModel'
-import type { ForegroundProcessor } from '../model/processing'
-import { withAspectRatio, type Template } from '../model/templates'
-import { Results } from './Results'
+import type { CSSProperties } from 'react'
+import type { useCaptureViewModel } from '../viewmodel/useCaptureViewModel'
+import { ResultsExport } from '../ResultsExport'
 
-export function Capture({ template, stream, onClose, process }: {
-  template: Template; stream: MediaStream; onClose: () => void; process?: ForegroundProcessor
-}) {
-  const [aspect, setAspect] = useState('original')
-  const captureTemplate = aspect === 'original' ? template : withAspectRatio(template, Number(aspect))
-  const vm = useCaptureViewModel(captureTemplate, stream)
+export function Capture({ viewModel }: { viewModel: ReturnType<typeof useCaptureViewModel> }) {
   const { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
-    current, completed, mirrored, chooseTimer, shoot, accept, select, retake } = vm
+    current, completed, mirrored, chooseTimer, shoot, accept, select, retake, aspect, setAspect,
+    template, captureTemplate, resultFrames, onClose, process } = viewModel
 
-  if (mode === 'results') return <Results template={captureTemplate} frames={frames.map(frame => frame!.original)} process={process} onClose={onClose} />
+  if (mode === 'results') return <ResultsExport template={captureTemplate} frames={resultFrames} process={process} onClose={onClose} />
 
   return <main className="studio">
     <div className="viewport"><div className="picture" style={{ aspectRatio: `${captureTemplate.width} / ${captureTemplate.height}`, '--picture-ratio': captureTemplate.width / captureTemplate.height } as CSSProperties}>
