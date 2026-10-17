@@ -5,7 +5,7 @@ import { createServer } from 'vite'
 test('template preview resolves independently of pose guides', async () => {
   const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true } })
   try {
-    const { parseTemplate } = await server.ssrLoadModule('/src/model/templates.ts')
+    const { parseTemplate, withAspectRatio } = await server.ssrLoadModule('/src/model/templates.ts')
     const path = '../../templates/example/config.json'
     const config = { title: 'Example', description: 'Example template', preview: 'cover.webp', duration: 200, width: 480, height: 600, frames: ['1.png'] }
     const images = { '../../templates/example/cover.webp': '/cover.webp', '../../templates/example/1.png': '/1.png' }
@@ -23,6 +23,9 @@ test('template preview resolves independently of pose guides', async () => {
     const frameImages = Object.fromEntries(frames.map(frame => [`../../templates/example/${frame}`, `/${frame}`]))
     assert.equal(parseTemplate(path, { ...config, frames }, { ...images, ...frameImages }).guides.length, 100)
     assert.throws(() => parseTemplate(path, { ...config, frames: [...frames, '101.png'] }, { ...images, ...frameImages }), /invalid config/)
+    const template = { width: 480, height: 600, guideWidth: 480, guideHeight: 600 }
+    assert.deepEqual(withAspectRatio(template, 1), { width: 480, height: 480, guideWidth: 480, guideHeight: 600 })
+    assert.deepEqual(withAspectRatio(template, 9 / 16), { width: 338, height: 600, guideWidth: 480, guideHeight: 600 })
   } finally {
     await server.close()
   }

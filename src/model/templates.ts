@@ -11,6 +11,12 @@ export interface Template {
   guides: string[]
 }
 
+export function withAspectRatio(template: Template, ratio: number): Template {
+  const width = Math.min(template.width, Math.round(template.height * ratio))
+  const height = Math.min(template.height, Math.round(template.width / ratio))
+  return { ...template, width, height }
+}
+
 type TemplateConfig = Omit<Template, 'guideWidth' | 'guideHeight'>
 
 const configs = import.meta.glob('../../templates/*/config.json', { eager: true, import: 'default' })
