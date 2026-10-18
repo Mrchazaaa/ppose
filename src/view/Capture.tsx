@@ -18,11 +18,10 @@ export function Capture(props: {
     <div className="viewport">
       <LayeredPreview layers={layers} />
       {camera.countdown > 0 && <div className="countdown" aria-live="assertive">{camera.countdown}</div>}
-      <div className="studio-top"><button className="text-button" type="button" onClick={props.onClose}>← Exit studio</button><div className="step-label">FRAME {String(photos.index + 1).padStart(2, '0')} <span>/ {String(photos.frames.length).padStart(2, '0')}</span></div></div>
+      <div className="studio-top"><button className="text-button" type="button" onClick={props.onClose}>← Exit studio</button><CaptureSettings aspect={settings.aspect} hasFrames={settings.hasFrames} onAspectChange={settings.setAspect} timer={settings.timer} onTimerChange={settings.chooseTimer} layers={layers} /></div>
       {camera.error && <p className="notice studio-error" role="alert">{camera.error}</p>}
       <div className="studio-bottom">{mode === 'review' && <p className="studio-instruction">Check your shot. Accept it or retake it before making your GIF.</p>}
         <div className="capture-controls">
-          <CaptureSettings aspect={settings.aspect} hasFrames={settings.hasFrames} onAspectChange={settings.setAspect} timer={settings.timer} onTimerChange={settings.chooseTimer} layers={layers} />
           {mode === 'camera' ? <button className="shutter" type="button" disabled={!camera.ready || busy || camera.countdown > 0} aria-label="Take photo" onClick={camera.shoot}><span /></button> : <button className="button primary" type="button" disabled={busy} onClick={photos.accept}>{photos.completed === photos.frames.length - 1 && !photos.current?.accepted ? 'Make GIF' : 'Accept'}</button>}
           {mode === 'review' && <button className="button secondary" type="button" disabled={busy} onClick={photos.retake}>↺ Retake</button>}
         </div>
