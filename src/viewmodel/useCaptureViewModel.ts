@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { capturePhoto } from '../model/processing'
 import { withAspectRatio, type Template } from '../model/templates'
-import { useCaptureLayersViewModel } from './useCaptureLayersViewModel'
+import { useCaptureLayersViewModel, type LayerInput } from './useCaptureLayersViewModel'
 
 type Frame = { original: Blob; url: string; accepted: boolean }
 
@@ -11,6 +11,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const alive = useRef(true)
   const [frames, setFrames] = useState<(Frame | null)[]>(() => Array(template.guides.length).fill(null))
   const [index, setIndex] = useState(0)
+  const [overlayIndex, setOverlayIndex] = useState<number | null>(null)
   const [mode, setMode] = useState<'camera' | 'review' | 'results'>('camera')
   const [timer, setTimer] = useState(0)
   const [countdown, setCountdown] = useState(0)
@@ -23,7 +24,14 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const current = frames[index]
   const completed = frames.filter(frame => frame?.accepted).length
   const mirrored = stream.getVideoTracks()[0]?.getSettings().facingMode !== 'environment'
-  const { layers, overlayIndex, toggleOverlay, clearOverlay } = useCaptureLayersViewModel(template, frames, index, mode, mirrored)
+  const layerInputs: LayerInput[] = [
+    mode === 'camera'
+      ? { id: 'base', kind: 'video', label: 'Camera / photo', defaultOpacity: 100, zIndex: 0, aspectRatio: captureTemplate.width / captureTemplate.height, className: 'camera-video', style: { transform: mirrored ? 'scaleX(-1)' : 'none' }, ref: video, ariaLabel: 'Live camera preview', onReady: () => setReady(true), onError: () => setError('Unable to start camera preview.') }
+      : { id: 'base', kind: 'image', label: 'Camera / photo', url: current?.url, alt: `Captured frame ${index + 1}`, defaultOpacity: 100, zIndex: 0, aspectRatio: captureTemplate.width / captureTemplate.height, className: 'review-image' },
+    { id: 'overlay', kind: 'image', label: 'Frame overlay', url: overlayIndex === null ? undefined : frames[overlayIndex]?.url, alt: '', defaultOpacity: 40, zIndex: 1, className: 'frame-overlay' },
+    { id: 'guide', kind: 'image', label: 'Guide overlay', url: template.guides[index], alt: 'Pose guide', defaultOpacity: 100, zIndex: 2, className: 'pose-guide', style: { width: `${template.guideWidth / template.width * 100}%`, height: `${template.guideHeight / template.height * 100}%` } },
+  ]
+  const layers = useCaptureLayersViewModel(layerInputs)
 
   useEffect(() => {
     alive.current = true
@@ -91,7 +99,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   function retake() {
     if (busy) return
     if (current) { URL.revokeObjectURL(current.url); urls.current.delete(current.url) }
-    clearOverlay(index)
+    setOverlayIndex(previous => previous === index ? null : previous)
     setFrames(previous => previous.map((frame, position) => position === index ? null : frame))
     setError('')
     setMode('camera')
@@ -99,7 +107,8 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
 
   function chooseTimer(seconds: number) { setTimer(seconds); setCountdown(0) }
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
-  return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
+  function toggleOverlay(position: number) { setOverlayIndex(previous => previous === position ? null : position) }
+  return { video, frames, index, mode, timer, countdown, busy, error, ready,
     current, completed, layers, overlayIndex, toggleOverlay,
     chooseTimer, shoot, accept, select, retake, aspect, setAspect,
     captureTemplate, resultFrames }

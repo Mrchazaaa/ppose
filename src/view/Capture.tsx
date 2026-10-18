@@ -9,7 +9,7 @@ import { Results } from './Results'
 export function Capture(props: {
   template: Template; stream: MediaStream; onClose: () => void; process?: ForegroundProcessor
 }) {
-  const { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
+  const { frames, index, mode, timer, countdown, busy, error, ready,
     current, completed, layers, overlayIndex, toggleOverlay,
     chooseTimer, shoot, accept, select, retake, aspect, setAspect,
     captureTemplate, resultFrames } = useCaptureViewModel(props.template, props.stream)
@@ -18,7 +18,7 @@ export function Capture(props: {
 
   return <main className="studio">
     <div className="viewport">
-      <LayeredPreview captureTemplate={captureTemplate} video={video} layers={layers} onReady={() => setReady(true)} onError={() => setError('Unable to start camera preview.')} />
+      <LayeredPreview layers={layers} />
       {countdown > 0 && <div className="countdown" aria-live="assertive">{countdown}</div>}
       <div className="studio-top"><button className="text-button" type="button" onClick={props.onClose}>← Exit studio</button><div className="step-label">FRAME {String(index + 1).padStart(2, '0')} <span>/ {String(frames.length).padStart(2, '0')}</span></div></div>
       {error && <p className="notice studio-error" role="alert">{error}</p>}

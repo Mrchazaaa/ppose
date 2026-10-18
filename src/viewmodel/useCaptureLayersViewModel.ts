@@ -1,27 +1,20 @@
-import { useState, type CSSProperties } from 'react'
-import type { Template } from '../model/templates'
+import { useState, type CSSProperties, type RefObject } from 'react'
 
-export type PreviewLayer = {
-  label: string; opacity: number; onOpacityChange: (opacity: number) => void
+export type LayerInput = {
+  id: string; label: string; defaultOpacity: number; zIndex: number; aspectRatio?: number
   className: string; style?: CSSProperties
-} & ({ kind: 'video' } | { kind: 'image'; url?: string; alt: string })
+} & ({ kind: 'video'; ref: RefObject<HTMLVideoElement | null>; ariaLabel: string; onReady: () => void; onError: () => void }
+  | { kind: 'image'; url?: string; alt: string })
 
-export function useCaptureLayersViewModel(template: Template, frames: ({ url: string } | null)[], index: number, mode: 'camera' | 'review' | 'results', mirrored: boolean) {
-  const [overlayIndex, setOverlayIndex] = useState<number | null>(null)
-  const [cameraOpacity, setCameraOpacity] = useState(100)
-  const [guideOpacity, setGuideOpacity] = useState(100)
-  const [overlayOpacity, setOverlayOpacity] = useState(40)
+export type PreviewLayer = LayerInput & { opacity: number; onOpacityChange: (opacity: number) => void }
 
-  const layers: PreviewLayer[] = [
-    mode === 'camera'
-      ? { kind: 'video', label: 'Camera / photo', opacity: cameraOpacity, onOpacityChange: setCameraOpacity, className: 'camera-video', style: { transform: mirrored ? 'scaleX(-1)' : 'none' } }
-      : { kind: 'image', label: 'Camera / photo', url: frames[index]?.url, alt: `Captured frame ${index + 1}`, opacity: cameraOpacity, onOpacityChange: setCameraOpacity, className: 'review-image' },
-    { kind: 'image', label: 'Frame overlay', url: overlayIndex === null ? undefined : frames[overlayIndex]?.url, alt: '', opacity: overlayOpacity, onOpacityChange: setOverlayOpacity, className: 'frame-overlay' },
-    { kind: 'image', label: 'Guide overlay', url: template.guides[index], alt: 'Pose guide', opacity: guideOpacity, onOpacityChange: setGuideOpacity, className: 'pose-guide', style: { width: `${template.guideWidth / template.width * 100}%`, height: `${template.guideHeight / template.height * 100}%` } },
-  ]
+export function useCaptureLayersViewModel(inputs: LayerInput[]) {
+  const [opacities, setOpacities] = useState<Record<string, number>>({})
+  const layers: PreviewLayer[] = inputs.map(layer => ({
+    ...layer,
+    opacity: opacities[layer.id] ?? layer.defaultOpacity,
+    onOpacityChange: opacity => setOpacities(previous => ({ ...previous, [layer.id]: opacity })),
+  }))
 
-  function toggleOverlay(position: number) { setOverlayIndex(previous => previous === position ? null : position) }
-  function clearOverlay(position: number) { setOverlayIndex(previous => previous === position ? null : previous) }
-
-  return { layers, overlayIndex, toggleOverlay, clearOverlay }
+  return layers
 }

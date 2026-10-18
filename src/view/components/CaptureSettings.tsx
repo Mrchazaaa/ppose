@@ -12,7 +12,7 @@ export function CaptureSettings(props: {
       <label>Aspect ratio<select value={props.aspect} disabled={props.hasFrames} onChange={event => props.onAspectChange(event.target.value)}><option value="original">Template</option><option value="1">1:1</option><option value="0.8">4:5</option><option value="0.5625">9:16</option></select></label>
       {props.hasFrames && <small>Retake all photos to change ratio.</small>}
       <label>Timer<select value={props.timer} onChange={event => props.onTimerChange(Number(event.target.value))}><option value="0">Off</option><option value="3">3 sec</option><option value="5">5 sec</option><option value="10">10 sec</option></select></label>
-      {props.layers.map(layer => <label key={layer.label}>{layer.label} opacity: {layer.opacity}%<input type="range" min="0" max="100" value={layer.opacity} onChange={event => layer.onOpacityChange(Number(event.target.value))} /></label>)}
+      {props.layers.map(layer => <label key={layer.id}>{layer.label} opacity: {layer.opacity}%<input type="range" min="0" max="100" value={layer.opacity} onChange={event => layer.onOpacityChange(Number(event.target.value))} /></label>)}
     </div>
   </details>
 }
