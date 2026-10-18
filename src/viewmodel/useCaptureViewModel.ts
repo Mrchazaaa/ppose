@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { capturePhoto } from '../model/processing'
 import { withAspectRatio, type Template } from '../model/templates'
+import { useCaptureLayersViewModel } from './useCaptureLayersViewModel'
 
 type Frame = { original: Blob; url: string; accepted: boolean }
 
@@ -10,9 +11,6 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const alive = useRef(true)
   const [frames, setFrames] = useState<(Frame | null)[]>(() => Array(template.guides.length).fill(null))
   const [index, setIndex] = useState(0)
-  const [overlayIndex, setOverlayIndex] = useState<number | null>(null)
-  const [guideOpacity, setGuideOpacity] = useState(100)
-  const [overlayOpacity, setOverlayOpacity] = useState(40)
   const [mode, setMode] = useState<'camera' | 'review' | 'results'>('camera')
   const [timer, setTimer] = useState(0)
   const [countdown, setCountdown] = useState(0)
@@ -25,6 +23,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   const current = frames[index]
   const completed = frames.filter(frame => frame?.accepted).length
   const mirrored = stream.getVideoTracks()[0]?.getSettings().facingMode !== 'environment'
+  const { layers, overlayIndex, toggleOverlay, clearOverlay } = useCaptureLayersViewModel(template, frames, index, mode, mirrored)
 
   useEffect(() => {
     alive.current = true
@@ -92,7 +91,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   function retake() {
     if (busy) return
     if (current) { URL.revokeObjectURL(current.url); urls.current.delete(current.url) }
-    if (overlayIndex === index) setOverlayIndex(null)
+    clearOverlay(index)
     setFrames(previous => previous.map((frame, position) => position === index ? null : frame))
     setError('')
     setMode('camera')
@@ -100,12 +99,8 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
 
   function chooseTimer(seconds: number) { setTimer(seconds); setCountdown(0) }
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
-  function toggleOverlay(position: number) {
-    setOverlayIndex(overlayIndex === position ? null : position)
-  }
-
   return { video, frames, index, mode, timer, countdown, busy, error, ready, setReady, setError,
-    current, completed, mirrored, overlayIndex, toggleOverlay, guideOpacity, setGuideOpacity, overlayOpacity, setOverlayOpacity,
+    current, completed, layers, overlayIndex, toggleOverlay,
     chooseTimer, shoot, accept, select, retake, aspect, setAspect,
     captureTemplate, resultFrames }
 }

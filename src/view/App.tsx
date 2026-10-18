@@ -1,4 +1,4 @@
-import { TemplateCard } from '../components/TemplateCard'
+import { TemplateCard } from './components/TemplateCard'
 import { useAppViewModel } from '../viewmodel/useAppViewModel'
 import { Capture } from './Capture'
 
