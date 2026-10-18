@@ -9,26 +9,23 @@ import { Results } from './Results'
 export function Capture(props: {
   template: Template; stream: MediaStream; onClose: () => void; process?: ForegroundProcessor
 }) {
-  const { frames, index, mode, timer, countdown, busy, error, ready,
-    current, completed, layers, overlayIndex, toggleOverlay,
-    chooseTimer, shoot, accept, select, retake, aspect, setAspect,
-    captureTemplate, resultFrames } = useCaptureViewModel(props.template, props.stream)
+  const { mode, busy, layers, camera, photos, settings, result } = useCaptureViewModel(props.template, props.stream)
 
-  if (mode === 'results') return <Results template={captureTemplate} frames={resultFrames} process={props.process} onClose={props.onClose} />
+  if (mode === 'results') return <Results template={result.template} frames={result.frames} process={props.process} onClose={props.onClose} />
 
   return <main className="studio">
     <div className="viewport">
       <LayeredPreview layers={layers} />
-      {countdown > 0 && <div className="countdown" aria-live="assertive">{countdown}</div>}
-      <div className="studio-top"><button className="text-button" type="button" onClick={props.onClose}>← Exit studio</button><div className="step-label">FRAME {String(index + 1).padStart(2, '0')} <span>/ {String(frames.length).padStart(2, '0')}</span></div></div>
-      {error && <p className="notice studio-error" role="alert">{error}</p>}
+      {camera.countdown > 0 && <div className="countdown" aria-live="assertive">{camera.countdown}</div>}
+      <div className="studio-top"><button className="text-button" type="button" onClick={props.onClose}>← Exit studio</button><div className="step-label">FRAME {String(photos.index + 1).padStart(2, '0')} <span>/ {String(photos.frames.length).padStart(2, '0')}</span></div></div>
+      {camera.error && <p className="notice studio-error" role="alert">{camera.error}</p>}
       <div className="studio-bottom">{mode === 'review' && <p className="studio-instruction">Check your shot. Accept it or retake it before making your GIF.</p>}
         <div className="capture-controls">
-          <CaptureSettings aspect={aspect} hasFrames={frames.some(Boolean)} onAspectChange={setAspect} timer={timer} onTimerChange={chooseTimer} layers={layers} />
-          {mode === 'camera' ? <button className="shutter" type="button" disabled={!ready || busy || countdown > 0} aria-label="Take photo" onClick={shoot}><span /></button> : <button className="button primary" type="button" disabled={busy} onClick={accept}>{completed === frames.length - 1 && !current?.accepted ? 'Make GIF' : 'Accept'}</button>}
-          {mode === 'review' && <button className="button secondary" type="button" disabled={busy} onClick={retake}>↺ Retake</button>}
+          <CaptureSettings aspect={settings.aspect} hasFrames={settings.hasFrames} onAspectChange={settings.setAspect} timer={settings.timer} onTimerChange={settings.chooseTimer} layers={layers} />
+          {mode === 'camera' ? <button className="shutter" type="button" disabled={!camera.ready || busy || camera.countdown > 0} aria-label="Take photo" onClick={camera.shoot}><span /></button> : <button className="button primary" type="button" disabled={busy} onClick={photos.accept}>{photos.completed === photos.frames.length - 1 && !photos.current?.accepted ? 'Make GIF' : 'Accept'}</button>}
+          {mode === 'review' && <button className="button secondary" type="button" disabled={busy} onClick={photos.retake}>↺ Retake</button>}
         </div>
-        <FrameTimeline frames={frames} index={index} busy={busy} overlayIndex={overlayIndex} onSelect={select} onToggleOverlay={toggleOverlay} />
+        <FrameTimeline frames={photos.frames} index={photos.index} busy={busy} overlayIndex={photos.overlayIndex} onSelect={photos.select} onToggleOverlay={photos.toggleOverlay} />
       </div>
     </div>
   </main>

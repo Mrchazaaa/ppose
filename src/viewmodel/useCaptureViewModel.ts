@@ -108,8 +108,11 @@ export function useCaptureViewModel(template: Template, stream: MediaStream) {
   function chooseTimer(seconds: number) { setTimer(seconds); setCountdown(0) }
   function shoot() { if (timer) setCountdown(timer); else void takePhoto() }
   function toggleOverlay(position: number) { setOverlayIndex(previous => previous === position ? null : position) }
-  return { video, frames, index, mode, timer, countdown, busy, error, ready,
-    current, completed, layers, overlayIndex, toggleOverlay,
-    chooseTimer, shoot, accept, select, retake, aspect, setAspect,
-    captureTemplate, resultFrames }
+  return {
+    mode, busy, layers,
+    camera: { ready, countdown, error, shoot },
+    photos: { frames, index, current, completed, overlayIndex, toggleOverlay, select, retake, accept },
+    settings: { aspect, setAspect, timer, chooseTimer, hasFrames: frames.some(Boolean) },
+    result: { template: captureTemplate, frames: resultFrames },
+  }
 }

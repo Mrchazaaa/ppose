@@ -15,4 +15,5 @@
   ```
 
 - Create a view model specifically for each view. Name its hook `use{ViewName}ViewModel`, where `{ViewName}` is the view component's name (for example, `Results` uses `useResultsViewModel`).
+- Compose related hooks inside the view model so the view calls one dedicated hook. Group related returned state and actions into named objects when the return becomes crowded (for example, `camera`, `photos`, `settings`, and `result` in `useCaptureViewModel`); keep values shared across groups at the top level. Pass individual values to child components, not entire view-model groups.
 - Keep workflow state and actions in the view model and rendering in the view. Mount views conditionally in the parent rather than calling their hooks conditionally.
