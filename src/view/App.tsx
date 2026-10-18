@@ -1,6 +1,7 @@
 import { TemplateCard } from './components/TemplateCard'
 import { useAppViewModel } from '../viewmodel/useAppViewModel'
 import { Capture } from './Capture'
+import './App.scss'
 
 export function App() {
   const { templates, loading, camera, error, session, starting, start, close } = useAppViewModel()

@@ -1,0 +1,10 @@
+.templates { padding-bottom: var(--space-8); }
+.section-heading { display: flex; align-items: end; justify-content: space-between; padding: var(--space-7) 0; }
+.section-heading h1 { font-size: clamp(30px, 4vw, 46px); letter-spacing: -.05em; margin: var(--space-3) 0 0; }
+.section-note { color: var(--muted); padding-bottom: 5px; }
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 370px)); gap: var(--space-5); }
+
+@media (max-width: 600px) {
+  .section-note { display: none; }
+  .privacy-note { font-size: 9px; }
+}

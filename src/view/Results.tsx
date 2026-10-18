@@ -1,6 +1,7 @@
 import type { ForegroundProcessor } from '../model/processing'
 import type { Template } from '../model/templates'
 import { useResultsViewModel } from '../viewmodel/useResultsViewModel'
+import './Results.scss'
 
 export function Results(props: {
   template: Template; frames: Blob[]; process?: ForegroundProcessor; onClose: () => void

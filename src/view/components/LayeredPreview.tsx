@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { PreviewLayer } from '../../viewmodel/useCaptureLayersViewModel'
+import './LayeredPreview.scss'
 
 export function LayeredPreview(props: { layers: PreviewLayer[] }) {
   const ratio = props.layers.find(layer => layer.aspectRatio !== undefined)?.aspectRatio ?? 1

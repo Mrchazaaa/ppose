@@ -1,0 +1,32 @@
+@use './variables';
+
+* { box-sizing: border-box; }
+html { min-width: 320px; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); }
+button, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: var(--space-1); }
+button:disabled { opacity: .4; cursor: not-allowed; }
+.shell { max-width: 1280px; margin: 0 auto; padding: 0 44px; }
+.masthead { height: var(--masthead-height); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.brand { color: var(--text); text-decoration: none; font-size: 30px; letter-spacing: -.095em; font-weight: 850; line-height: 1; }
+.brand span:first-child { color: var(--accent); }
+.brand .brand-dot { color: var(--accent); }
+.eyebrow, .section-note, .privacy-note, .card-frame, .step-label, .result-preview > span { font-size: 11px; font-weight: 760; letter-spacing: .14em; }
+.privacy-note { color: var(--muted); text-align: right; }
+.eyebrow { color: var(--accent); }
+h1, h2, h3, p { margin-top: 0; }
+h1 em { font-style: normal; color: var(--accent); }
+.circle-button { width: var(--control-size); height: var(--control-size); border-radius: 50%; border: none; background: var(--accent); color: var(--accent-dark); font-size: 24px; cursor: pointer; flex: 0 0 auto; }
+.circle-button:not(:disabled):hover, .button.primary:hover { background: var(--accent-hover); }
+.notice { color: var(--accent); margin: 18px 0; line-height: 1.5; }
+.notice a { color: inherit; }
+.text-button { background: none; border: none; color: var(--text); cursor: pointer; padding: 10px 0; }
+.text-button:hover { color: var(--accent); }
+.button { border-radius: 100px; padding: 15px 22px; font-weight: 700; text-decoration: none; border: 1px solid var(--line); cursor: pointer; text-align: center; }
+.button.primary { background: var(--accent); color: var(--accent-dark); border-color: var(--accent); }
+.button.secondary { background: var(--surface); color: var(--text); }
+@media (max-width: 600px) {
+  :root { --masthead-height: 74px; --shutter-size: 64px; }
+  .shell { padding: 0 var(--space-5); }
+}

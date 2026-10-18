@@ -5,6 +5,7 @@ import { CaptureSettings } from './components/CaptureSettings'
 import { FrameTimeline } from './components/FrameTimeline'
 import { useCaptureViewModel } from '../viewmodel/useCaptureViewModel'
 import { Results } from './Results'
+import './Capture.scss'
 
 export function Capture(props: {
   template: Template; stream: MediaStream; onClose: () => void; process?: ForegroundProcessor

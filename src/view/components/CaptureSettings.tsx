@@ -1,4 +1,5 @@
 import type { PreviewLayer } from '../../viewmodel/useCaptureLayersViewModel'
+import './CaptureSettings.scss'
 
 export function CaptureSettings(props: {
   aspect: string; hasFrames: boolean; onAspectChange: (aspect: string) => void

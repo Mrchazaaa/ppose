@@ -42,6 +42,6 @@ Run `npm run guides:gif -- hello` to animate the listed guide PNGs using the tem
 
 ## Style guide
 
-Dark surfaces, mint accents, rounded cards and controls, and compact uppercase labels. Design tokens (colors, radius and font stack) live in `src/variables.css`; layouts and components use those tokens in `src/styles.css`. `src/view/` renders the menu, capture, and results; `src/viewmodel/` manages their state and actions; `src/model/` loads templates and processes images. Reusable controls share `.button`, `.text-button`, and `.circle-button` styles.
+Dark surfaces, mint accents, rounded cards and controls, and compact uppercase labels. Design tokens (colors, radius, font stack, spacing, and shared sizes) live in `src/variables.scss`; global styles and reusable controls (`.button`, `.text-button`, `.circle-button`) live in `src/styles.scss`. Each view and component imports its own adjacent `.scss` file. `src/view/` renders the menu, capture, and results; `src/viewmodel/` manages their state and actions; `src/model/` loads templates and processes images.
 
 Background removal is temporarily disabled. Set `REMOVE_BACKGROUNDS` to `true` in `src/viewmodel/useResultsViewModel.ts` to enable it again. The background-removal dependency is AGPL-3.0. Check its license terms before distributing the app.

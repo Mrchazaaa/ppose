@@ -1,4 +1,5 @@
 import type { Template } from '../../model/templates'
+import './TemplateCard.scss'
 
 export function TemplateCard(props: {
   template: Template; disabled: boolean; onStart: (template: Template) => void

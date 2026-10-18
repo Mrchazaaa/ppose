@@ -1,3 +1,5 @@
+import './FrameTimeline.scss'
+
 export function FrameTimeline(props: {
   frames: ({ url: string; accepted: boolean } | null)[]; index: number; busy: boolean; overlayIndex: number | null
   onSelect: (position: number) => void; onToggleOverlay: (position: number) => void

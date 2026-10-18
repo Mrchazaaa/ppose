@@ -1,0 +1,11 @@
+.capture-settings { justify-self: start; position: relative; }
+.capture-settings summary { display: grid; place-items: center; width: var(--control-size); height: var(--control-size); border-radius: 50%; background: var(--surface); cursor: pointer; list-style: none; }
+.capture-settings summary::-webkit-details-marker { display: none; }
+.capture-settings summary:focus-visible { outline: 3px solid var(--accent); outline-offset: var(--space-1); }
+.settings-panel { position: absolute; left: 0; bottom: calc(100% + var(--space-3)); width: 240px; max-height: calc(100dvh - 170px); overflow-y: auto; display: grid; gap: var(--space-4); padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--space-4); box-shadow: 0 var(--space-3) var(--space-8) #0009; }
+.settings-panel strong { font-size: 15px; }
+.settings-panel label { display: grid; gap: 6px; font-size: 13px; }
+.settings-panel input { accent-color: var(--accent); }
+.settings-panel input[type="range"] { width: 100%; }
+.settings-panel select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: var(--space-2); padding: 9px; }
+.settings-panel small { color: var(--muted); line-height: 1.4; }
