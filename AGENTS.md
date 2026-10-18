@@ -1,5 +1,3 @@
 # Agent instructions
 
-Use [docs/index.md](docs/index.md) to find relevant project documentation before making changes.
-
-When planning, writing, or reviewing code, read [docs/reference/code-conventions.md](docs/reference/code-conventions.md) and apply its conventions. 
+Before starting any task, always read [docs/index.md](docs/index.md). Use it to discover documentation and instructions relevant to the task, then read and follow those pages. Do not read the entire documentation repository by default; follow relevant links from the index as needed. Update relevant documentation when the task changes what it describes.
