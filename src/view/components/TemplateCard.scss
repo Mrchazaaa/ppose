@@ -1,8 +1,59 @@
-.template-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
-.card-art { position: relative; height: 325px; background: radial-gradient(circle at 50% 45%, var(--card-glow), var(--card-mid) 55%, var(--card-edge)); display: flex; justify-content: center; align-items: center; overflow: hidden; }
-.card-art::before { content: ''; position: absolute; width: 260px; height: 260px; border: 1px solid var(--card-ring); border-radius: 50%; }
-.card-art img { height: 88%; width: 80%; object-fit: contain; position: relative; filter: drop-shadow(0 0 24px var(--guide-glow)); }
-.card-frame { position: absolute; z-index: 1; color: var(--accent); bottom: 23px; right: 23px; }
-.card-footer { padding: 23px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
-.card-footer h3 { font-size: 21px; margin: 0 0 6px; letter-spacing: -.03em; }
-.card-footer p { color: var(--muted); font-size: 13px; margin: 0; }
+.template-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+}
+.card-art {
+  position: relative;
+  height: 325px;
+  background: radial-gradient(
+    circle at 50% 45%,
+    var(--card-glow),
+    var(--card-mid) 55%,
+    var(--card-edge)
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.card-art::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border: 1px solid var(--card-ring);
+  border-radius: 50%;
+}
+.card-art img {
+  height: 88%;
+  width: 80%;
+  object-fit: contain;
+  position: relative;
+  filter: drop-shadow(0 0 24px var(--guide-glow));
+}
+.card-frame {
+  position: absolute;
+  z-index: 1;
+  color: var(--accent);
+  bottom: 23px;
+  right: 23px;
+}
+.card-footer {
+  padding: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.card-footer h3 {
+  font-size: 21px;
+  margin: 0 0 6px;
+  letter-spacing: -0.03em;
+}
+.card-footer p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
