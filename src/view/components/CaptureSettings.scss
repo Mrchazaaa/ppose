@@ -7,5 +7,6 @@
 .settings-panel label { display: grid; gap: 6px; font-size: 13px; }
 .settings-panel input { accent-color: var(--accent); }
 .settings-panel input[type="range"] { width: 100%; }
+.settings-panel input[type="color"] { width: 100%; height: var(--control-size); padding: 3px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--space-2); cursor: pointer; }
 .settings-panel select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: var(--space-2); padding: 9px; }
 .settings-panel small { color: var(--muted); line-height: 1.4; }

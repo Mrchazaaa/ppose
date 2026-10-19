@@ -40,7 +40,32 @@ export function capturePhoto(video: HTMLVideoElement, width: number, height: num
   return new Promise((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('Could not capture photo')), 'image/png'))
 }
 
-async function pixels(blob: Blob, width: number, height: number): Promise<Uint8ClampedArray> {
+export function resizeImportedPhoto(placement: { x: number; y: number; width: number; rotation: number }, width: number, imageRatio: number, frameRatio: number) {
+  const nextWidth = Math.max(10, Math.min(300, width))
+  const shift = (placement.width - nextWidth) / 2
+  return { ...placement, x: placement.x + shift, y: placement.y + shift * frameRatio * imageRatio, width: nextWidth }
+}
+
+export async function captureImportedPhoto(photo: Blob, width: number, height: number, placement: { x: number; y: number; width: number; rotation: number }): Promise<Blob> {
+  const image = await createImageBitmap(photo)
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const context = canvas.getContext('2d')
+    if (!context) throw new Error('Canvas is unavailable')
+    const drawnWidth = width * placement.width / 100
+    const drawnHeight = drawnWidth * image.height / image.width
+    if (placement.rotation) {
+      context.translate(width * placement.x / 100 + drawnWidth / 2, height * placement.y / 100 + drawnHeight / 2)
+      context.rotate(placement.rotation * Math.PI / 180)
+      context.drawImage(image, -drawnWidth / 2, -drawnHeight / 2, drawnWidth, drawnHeight)
+    } else context.drawImage(image, width * placement.x / 100, height * placement.y / 100, drawnWidth, drawnHeight)
+    return await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('Could not capture imported photo')), 'image/png'))
+  } finally { image.close() }
+}
+
+async function pixels(blob: Blob, width: number, height: number, background: string | null): Promise<Uint8ClampedArray> {
   const image = await createImageBitmap(blob)
   try {
     const canvas = document.createElement('canvas')
@@ -48,6 +73,7 @@ async function pixels(blob: Blob, width: number, height: number): Promise<Uint8C
     canvas.height = height
     const context = canvas.getContext('2d', { willReadFrequently: true })
     if (!context) throw new Error('Canvas is unavailable')
+    if (background) { context.fillStyle = background; context.fillRect(0, 0, width, height) }
     context.drawImage(image, 0, 0, width, height)
     return context.getImageData(0, 0, width, height).data
   } finally {
@@ -55,11 +81,11 @@ async function pixels(blob: Blob, width: number, height: number): Promise<Uint8C
   }
 }
 
-export async function createGif(frames: Blob[], template: Template, onProgress: (done: number) => void, signal?: AbortSignal): Promise<Blob> {
+export async function createGif(frames: Blob[], template: Template, onProgress: (done: number) => void, signal?: AbortSignal, background: string | null = null): Promise<Blob> {
   async function* rgbaFrames() {
     for (const frame of frames) {
       if (signal?.aborted) throw new DOMException('GIF export cancelled', 'AbortError')
-      yield await pixels(frame, template.width, template.height)
+      yield await pixels(frame, template.width, template.height, background)
     }
   }
   return encodeGif(rgbaFrames(), template.width, template.height, template.duration, onProgress, signal)

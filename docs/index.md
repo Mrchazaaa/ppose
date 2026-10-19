@@ -1,6 +1,6 @@
 # ppose documentation
 
-ppose is a browser-based app for easily creating looping, transparent GIFs. Choose a pose template, photograph each guided frame, review your shots, and download the animation. Photos are processed on your device; there is no backend or photo upload.
+ppose is a browser-based app for easily creating looping GIFs. Photos stay on your device; there is no backend or photo upload.
 
 ## Guides
 

@@ -5,7 +5,7 @@ import type { Template } from '../model/templates'
 // Set to true to restore background removal before GIF encoding.
 const REMOVE_BACKGROUNDS = false
 
-export function useResultsViewModel(template: Template, frames: Blob[], process: ForegroundProcessor = removePhotoBackground) {
+export function useResultsViewModel(template: Template, frames: Blob[], background: string | null, process: ForegroundProcessor = removePhotoBackground) {
   const processedFrames = useRef<Blob[] | null>(null)
   const [url, setUrl] = useState('')
   const [progress, setProgress] = useState(0)
@@ -28,7 +28,7 @@ export function useResultsViewModel(template: Template, frames: Blob[], process:
         setStage('gif')
         setProgress(0)
         encoding = true
-        const blob = await createGif(outputFrames, template, done => { if (active) setProgress(done) }, controller.signal)
+        const blob = await createGif(outputFrames, template, done => { if (active) setProgress(done) }, controller.signal, background)
         if (active) { objectUrl = URL.createObjectURL(blob); setUrl(objectUrl) }
       } catch (reason) {
         if (active) {
@@ -39,7 +39,7 @@ export function useResultsViewModel(template: Template, frames: Blob[], process:
     }
     void run()
     return () => { active = false; controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl) }
-  }, [frames, template, process, attempt])
+  }, [frames, template, background, process, attempt])
 
   function retry() { setError(''); setStage(REMOVE_BACKGROUNDS ? 'background' : 'gif'); setProgress(0); setAttempt(value => value + 1) }
   return { url, progress, stage, error, retry }

@@ -4,6 +4,7 @@ import './CaptureSettings.scss'
 export function CaptureSettings(props: {
   aspect: string; hasFrames: boolean; onAspectChange: (aspect: string) => void
   timer: number; onTimerChange: (seconds: number) => void
+  background: string | null; onBackgroundChange: (background: string | null) => void
   layers: PreviewLayer[]
 }) {
   return <details className="capture-settings">
@@ -13,6 +14,8 @@ export function CaptureSettings(props: {
       <label>Aspect ratio<select value={props.aspect} disabled={props.hasFrames} onChange={event => props.onAspectChange(event.target.value)}><option value="original">Template</option><option value="1">1:1</option><option value="0.8">4:5</option><option value="0.5625">9:16</option></select></label>
       {props.hasFrames && <small>Retake all photos to change ratio.</small>}
       <label>Timer<select value={props.timer} onChange={event => props.onTimerChange(Number(event.target.value))}><option value="0">Off</option><option value="3">3 sec</option><option value="5">5 sec</option><option value="10">10 sec</option></select></label>
+      <label>GIF background<select value={props.background === null ? 'transparent' : 'color'} onChange={event => props.onBackgroundChange(event.target.value === 'transparent' ? null : '#ffffff')}><option value="transparent">Transparent</option><option value="color">Color</option></select></label>
+      {props.background !== null && <label>Background color<input type="color" value={props.background} onChange={event => props.onBackgroundChange(event.target.value)} /></label>}
       {props.layers.map(layer => <label key={layer.id}>{layer.label} opacity: {layer.opacity}%<input type="range" min="0" max="100" value={layer.opacity} onChange={event => layer.onOpacityChange(Number(event.target.value))} /></label>)}
     </div>
   </details>

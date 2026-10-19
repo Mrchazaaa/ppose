@@ -1,16 +1,28 @@
 .studio { height: 100dvh; overflow: hidden; }
 .viewport { position: relative; width: 100%; height: 100%; background: var(--surface-raised); overflow: hidden; container-type: size; display: grid; place-items: center; }
 .studio-top, .studio-bottom { position: absolute; z-index: 1; left: 0; right: 0; padding-left: max(var(--space-6), env(safe-area-inset-left)); padding-right: max(var(--space-6), env(safe-area-inset-right)); color: var(--text); }
-.studio-top { top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-top: max(var(--space-4), env(safe-area-inset-top)); padding-bottom: var(--space-8); background: linear-gradient(to bottom, var(--bg), transparent); }
+.studio-top { top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-top: max(var(--space-4), env(safe-area-inset-top)); padding-bottom: var(--space-8); background: linear-gradient(to bottom, var(--bg), transparent); pointer-events: none; }
+.studio-top .text-button, .studio-top .capture-settings { pointer-events: auto; }
 .studio-top .text-button { white-space: nowrap; }
 .studio-error { position: absolute; z-index: 2; top: 70px; left: 50%; transform: translateX(-50%); max-width: min(90%, 460px); padding: 10px var(--space-4); background: var(--bg); border-radius: 8px; text-align: center; }
-.studio-bottom { bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: var(--space-9); padding-bottom: max(var(--space-4), env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg), transparent); }
+.studio-bottom { bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: var(--space-9); padding-bottom: max(var(--space-4), env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg), transparent); pointer-events: none; }
+.studio-bottom button, .studio-bottom input, .studio-bottom summary, .studio-bottom .timeline { pointer-events: auto; }
 .studio-instruction { font-size: 14px; text-align: center; margin: 0; }
+.import-tools { display: flex; gap: var(--space-4); width: min(100%, 420px); padding: var(--space-2) var(--space-3); border-radius: 9px; background: var(--surface); }
+.import-tools label { flex: 1; min-width: 0; font-size: 12px; }
+.import-tools input { display: block; width: 100%; accent-color: var(--accent); }
 .countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: 110px; font-weight: 800; background: var(--overlay-bg); color: var(--accent); pointer-events: none; }
 .capture-controls { display: flex; align-items: center; justify-content: center; gap: var(--space-4); width: min(100%, 520px); }
 .capture-controls .button { min-width: 112px; min-height: var(--control-size); padding: 10px 14px; }
 .shutter { width: var(--shutter-size); height: var(--shutter-size); background: transparent; border: 3px solid var(--text); border-radius: 50%; padding: 6px; cursor: pointer; flex: 0 0 auto; }
 .shutter span { display: block; width: 100%; height: 100%; background: var(--accent); border-radius: 50%; }
+.timeline-controls { display: flex; align-items: center; gap: var(--space-2); max-width: 100%; min-width: 0; }
+.source-menu { position: relative; flex: 0 0 auto; }
+.source-menu summary { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--accent); font-size: 28px; cursor: pointer; list-style: none; }
+.source-menu summary::-webkit-details-marker { display: none; }
+.source-options { position: absolute; bottom: calc(100% + var(--space-2)); left: 0; min-width: 150px; padding: var(--space-2); background: var(--surface); border: 1px solid var(--line); border-radius: 9px; display: grid; gap: var(--space-1); }
+.source-options button { border: 0; border-radius: 6px; background: var(--surface-raised); color: var(--text); padding: var(--space-2); text-align: left; cursor: pointer; }
+.file-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
 @media (max-width: 600px) {
   .studio-top, .studio-bottom { padding-left: max(var(--space-3), env(safe-area-inset-left)); padding-right: max(var(--space-3), env(safe-area-inset-right)); }
