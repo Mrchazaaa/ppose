@@ -51,7 +51,7 @@ export function Results(props: {
           )}
         </div>
         <div className="result-output">
-          <div className="result-preview">
+          <div className="result-preview" style={{ aspectRatio: props.template.width / props.template.height }}>
             {url ? (
               <img src={url} alt={`Animated GIF of ${props.template.title}`} />
             ) : (
