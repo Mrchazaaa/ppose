@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { loadTemplates, type Template } from '../model/templates'
+import { loadTemplates, outputTemplate, type Template } from '../model/templates'
 
 type Session = { template: Template; stream: MediaStream | null }
 
@@ -28,8 +28,9 @@ export function useAppViewModel() {
     let stream: MediaStream | null = null
     if (camera === 'available') {
       try {
+        const output = outputTemplate(template)
         stream = await navigator.mediaDevices.getUserMedia({
-          audio: false, video: { facingMode: 'user', width: { ideal: template.width }, height: { ideal: template.height } },
+          audio: false, video: { facingMode: 'user', width: { ideal: output.width }, height: { ideal: output.height } },
         })
       } catch (reason) { console.error('Camera unavailable:', reason) }
     }

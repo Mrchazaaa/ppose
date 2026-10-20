@@ -90,12 +90,18 @@ async function pixels(blob: Blob, width: number, height: number, background: str
   }
 }
 
+export function gifDimensions(template: Pick<Template, 'width' | 'height'>) {
+  const scale = Math.min(1, 480 / template.width, 720 / template.height)
+  return { width: Math.max(1, Math.floor(template.width * scale)), height: Math.max(1, Math.floor(template.height * scale)) }
+}
+
 export async function createGif(frames: Blob[], template: Template, onProgress: (done: number) => void, signal?: AbortSignal, background: string | null = null): Promise<Blob> {
+  const { width, height } = gifDimensions(template)
   async function* rgbaFrames() {
     for (const frame of frames) {
       if (signal?.aborted) throw new DOMException('GIF export cancelled', 'AbortError')
-      yield await pixels(frame, template.width, template.height, background)
+      yield await pixels(frame, width, height, background)
     }
   }
-  return encodeGif(rgbaFrames(), template.width, template.height, template.duration, onProgress, signal)
+  return encodeGif(rgbaFrames(), width, height, template.duration, onProgress, signal)
 }

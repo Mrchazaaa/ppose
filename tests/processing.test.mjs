@@ -164,3 +164,37 @@ test('GIF export preserves opaque backgrounds and clears transparent frames', as
     await server.close()
   }
 })
+
+test('GIF export downsizes large captures to sharing dimensions', async () => {
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true } })
+  const oldBitmap = globalThis.createImageBitmap
+  const oldDocument = globalThis.document
+  try {
+    const { createGif, gifDimensions } = await server.ssrLoadModule('/src/model/processing.ts')
+    assert.deepEqual(gifDimensions({ width: 960, height: 960 }), { width: 480, height: 480 })
+    assert.deepEqual(gifDimensions({ width: 960, height: 1200 }), { width: 480, height: 600 })
+    assert.deepEqual(gifDimensions({ width: 676, height: 1200 }), { width: 405, height: 720 })
+    assert.deepEqual(gifDimensions({ width: 1280, height: 2048 }), { width: 450, height: 720 })
+    assert.deepEqual(gifDimensions({ width: 320, height: 400 }), { width: 320, height: 400 })
+    globalThis.createImageBitmap = async () => ({ close() {} })
+    globalThis.document = { createElement: () => {
+      const canvas = { width: 0, height: 0, getContext: () => ({
+        drawImage() {},
+        getImageData() {
+          const data = new Uint8ClampedArray(canvas.width * canvas.height * 4)
+          data.fill(255)
+          return { data }
+        },
+      }) }
+      return canvas
+    } }
+    const gif = await createGif([new Blob(['photo'])], { width: 676, height: 1200, duration: 200 }, () => {})
+    const bytes = new Uint8Array(await gif.arrayBuffer())
+    assert.equal(bytes[6] + (bytes[7] << 8), 405)
+    assert.equal(bytes[8] + (bytes[9] << 8), 720)
+  } finally {
+    globalThis.createImageBitmap = oldBitmap
+    globalThis.document = oldDocument
+    await server.close()
+  }
+})

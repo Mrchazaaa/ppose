@@ -19,4 +19,6 @@ After all shots are accepted, the app removes their backgrounds and creates the 
 
 Once every frame has been accepted, choose **Make my GIF**. The results view shows encoding progress, a looping preview, and a **Download GIF** link. If export fails, choose **Try again**. Close the results view to return to the template menu.
 
+GIF exports fit within 480×720 pixels while preserving the selected aspect ratio (for example, 480×480 for 1:1, 480×600 for 4:5, and 405×720 for 9:16).
+
 The result has a transparent background. GIF transparency is one-bit, so edges cannot be partially transparent. The first background-removal run downloads model and WASM assets and may take longer; cached assets can be reused offline. No photos or model input are uploaded.

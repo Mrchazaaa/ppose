@@ -17,6 +17,12 @@ export function withAspectRatio(template: Template, ratio: number): Template {
   return { ...template, width, height }
 }
 
+export function outputTemplate(template: Template, ratio: number | null = null): Template {
+  const cropped = ratio === null ? template : withAspectRatio(template, ratio)
+  const scale = Math.min(2, Math.floor(2048 / Math.max(cropped.width, cropped.height)))
+  return { ...cropped, width: cropped.width * scale, height: cropped.height * scale }
+}
+
 type TemplateConfig = Omit<Template, 'guideWidth' | 'guideHeight'>
 
 const configs = import.meta.glob('../../templates/*/config.json', { eager: true, import: 'default' })

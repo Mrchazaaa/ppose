@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { captureImportedPhoto, captureImportedVideo, capturePhoto, resizeImportedPhoto } from '../model/processing'
-import { withAspectRatio, type Template } from '../model/templates'
+import { outputTemplate, type Template } from '../model/templates'
 import { useCaptureLayersViewModel, type LayerInput } from './useCaptureLayersViewModel'
 
 type Frame = { original: Blob; url: string; accepted: boolean }
@@ -30,7 +30,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
   const [ready, setReady] = useState(false)
   const [aspect, setAspect] = useState('original')
   const [background, setBackground] = useState<string | null>(null)
-  const captureTemplate = useMemo(() => aspect === 'original' ? template : withAspectRatio(template, Number(aspect)), [template, aspect])
+  const captureTemplate = useMemo(() => outputTemplate(template, aspect === 'original' ? null : Number(aspect)), [template, aspect])
   const resultFrames = useMemo(() => mode === 'results' ? frames.map(frame => frame!.original) : [], [frames, mode])
   const current = frames[index]
   const completed = frames.filter(frame => frame?.accepted).length
