@@ -18,8 +18,12 @@
 }
 .template-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 370px));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 280px));
   gap: var(--space-5);
+}
+.custom-gif {
+  border-top: 1px solid var(--line);
+  padding: var(--space-7) 0;
 }
 
 @media (max-width: 600px) {

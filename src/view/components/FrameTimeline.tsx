@@ -7,6 +7,7 @@ export function FrameTimeline(props: {
   overlayIndex: number | null;
   onSelect: (position: number) => void;
   onToggleOverlay: (position: number) => void;
+  onAdd?: () => void;
 }) {
   return (
     <div className="timeline" aria-label="Frames">
@@ -35,6 +36,12 @@ export function FrameTimeline(props: {
           )}
         </div>
       ))}
+      {props.onAdd && (
+        <button className="timeline-frame add-frame" type="button" disabled={props.busy} onClick={props.onAdd} aria-label="Add another frame">
+          <span>+</span>
+          <small>ADD</small>
+        </button>
+      )}
     </div>
   );
 }

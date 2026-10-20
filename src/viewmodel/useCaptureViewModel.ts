@@ -19,7 +19,8 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
   const [videoDuration, setVideoDuration] = useState(0)
   const [videoRatio, setVideoRatio] = useState(1)
   const [placement, setPlacement] = useState({ x: 0, y: 0, width: 100, rotation: 0 })
-  const [frames, setFrames] = useState<(Frame | null)[]>(() => Array(template.guides.length).fill(null))
+  const custom = template.guides.length === 0
+  const [frames, setFrames] = useState<(Frame | null)[]>(() => Array(Math.max(1, template.guides.length)).fill(null))
   const [index, setIndex] = useState(0)
   const [overlayIndex, setOverlayIndex] = useState<number | null>(null)
   const [mode, setMode] = useState<'camera' | 'import' | 'video' | 'review' | 'results'>('camera')
@@ -61,7 +62,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
         }, onError: () => { setReady(false); setError('Could not play this video. Choose another video file.') } }
       : { id: 'base', kind: 'image', label: 'Camera / photo', url: mode === 'review' ? current?.url : undefined, alt: `Captured frame ${index + 1}`, defaultOpacity: 100, zIndex: 0, aspectRatio: captureTemplate.width / captureTemplate.height, className: 'review-image' },
     { id: 'overlay', kind: 'image', label: 'Frame overlay', url: overlayIndex === null ? undefined : frames[overlayIndex]?.url, alt: '', defaultOpacity: 40, zIndex: 1, className: 'frame-overlay' },
-    { id: 'guide', kind: 'image', label: 'Guide overlay', url: template.guides[index], alt: 'Pose guide', defaultOpacity: 100, zIndex: 2, className: 'pose-guide', style: { width: `${template.guideWidth / template.width * 100}%`, height: `${template.guideHeight / template.height * 100}%` } },
+    ...(!custom ? [{ id: 'guide', kind: 'image' as const, label: 'Guide overlay', url: template.guides[index], alt: 'Pose guide', defaultOpacity: 100, zIndex: 2, className: 'pose-guide', style: { width: `${template.guideWidth / template.width * 100}%`, height: `${template.guideHeight / template.height * 100}%` } }] : []),
   ]
   const layers = useCaptureLayersViewModel(layerInputs)
 
@@ -183,7 +184,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
     }
   }
 
-  function useCamera() { if (busy || !stream) return; clearImport(); setCountdown(0); setError(''); setMode('camera') }
+  function useCamera() { if (busy || !stream) return; if (mode !== 'camera') clearImport(); setCountdown(0); setError(''); setMode('camera') }
 
   function accept() {
     if (!current || busy) return
@@ -191,16 +192,34 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
     setFrames(previous => previous.map((frame, position) => position === index ? { ...frame!, accepted: true } : frame))
     const next = frames.findIndex((frame, position) => position !== index && !frame?.accepted)
     if (next !== -1) { setReady(false); setIndex(next); setMode(videoFile ? 'video' : imported ? 'import' : 'camera') }
-    else { stream?.getTracks().forEach(track => track.stop()); setMode('results') }
+    else if (!custom) makeGif()
+  }
+
+  function makeGif() {
+    if (busy || (custom && completed !== frames.length)) return
+    stream?.getTracks().forEach(track => track.stop())
+    setMode('results')
+  }
+
+  function addFrame() {
+    if (busy || !custom) return
+    setCountdown(0)
+    const nextMode = videoFile ? 'video' : imported ? 'import' : 'camera'
+    if (mode !== nextMode) setReady(false)
+    setError('')
+    setFrames(previous => [...previous, null])
+    setIndex(frames.length)
+    setMode(nextMode)
   }
 
   function select(position: number) {
     if (busy) return
     setCountdown(0)
-    setReady(false)
+    const nextMode = frames[position] ? 'review' : videoFile ? 'video' : imported ? 'import' : 'camera'
+    if (mode !== nextMode) setReady(false)
     setError('')
     setIndex(position)
-    setMode(frames[position] ? 'review' : videoFile ? 'video' : imported ? 'import' : 'camera')
+    setMode(nextMode)
   }
 
   function retake() {
@@ -223,7 +242,7 @@ export function useCaptureViewModel(template: Template, stream: MediaStream | nu
   return {
     mode, busy, layers,
     camera: { ready, countdown, error, shoot, useCamera, importPhoto, importVideo, videoFile, videoTime, videoDuration, seek, imported, placement, setPlacement, resize },
-    photos: { frames, index, current, completed, overlayIndex, toggleOverlay, select, retake, accept },
+    photos: { frames, index, current, completed, overlayIndex, toggleOverlay, select, retake, accept, addFrame, makeGif, custom },
     settings: { aspect, setAspect, timer, chooseTimer, background, setBackground, hasFrames: frames.some(Boolean) },
     result: { template: captureTemplate, frames: resultFrames, background },
   }

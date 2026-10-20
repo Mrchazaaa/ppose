@@ -24,6 +24,11 @@
   border: 2px solid var(--accent);
   color: var(--accent);
 }
+.add-frame {
+  flex: 0 0 auto;
+  border-style: dashed;
+  color: var(--accent);
+}
 .timeline-frame img {
   width: 100%;
   height: 100%;

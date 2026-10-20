@@ -4,7 +4,7 @@ import { Capture } from "./Capture";
 import "./App.scss";
 
 export function App() {
-  const { templates, loading, camera, error, session, starting, start, close } =
+  const { templates, loading, camera, error, session, starting, start, startCustom, close } =
     useAppViewModel();
 
   if (session)
@@ -65,6 +65,11 @@ export function App() {
             {error}
           </p>
         )}
+      </section>
+      <section className="custom-gif" aria-label="Create without a template">
+        <button className="button secondary" type="button" disabled={starting} onClick={startCustom}>
+          ＋ Create a custom GIF
+        </button>
       </section>
     </main>
   );

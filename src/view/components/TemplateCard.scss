@@ -6,7 +6,7 @@
 }
 .card-art {
   position: relative;
-  height: 325px;
+  height: 230px;
   background: radial-gradient(
     circle at 50% 45%,
     var(--card-glow),
@@ -21,8 +21,8 @@
 .card-art::before {
   content: "";
   position: absolute;
-  width: 260px;
-  height: 260px;
+  width: 180px;
+  height: 180px;
   border: 1px solid var(--card-ring);
   border-radius: 50%;
 }
@@ -37,18 +37,18 @@
   position: absolute;
   z-index: 1;
   color: var(--accent);
-  bottom: 23px;
-  right: 23px;
+  bottom: var(--space-4);
+  right: var(--space-4);
 }
 .card-footer {
-  padding: 23px;
+  padding: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 }
 .card-footer h3 {
-  font-size: 21px;
+  font-size: 18px;
   margin: 0 0 6px;
   letter-spacing: -0.03em;
 }

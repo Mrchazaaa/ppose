@@ -4,6 +4,8 @@
 
 Open the app and choose an animation template from the menu. You can import images or video without a camera. Camera capture requires permission and a secure context: use `localhost` on the development computer or trusted HTTPS on another device. If camera access fails, you can still use imported media; see the [local setup instructions](../../README.md#run-locally) for phone testing.
 
+To create a GIF without a pose guide, choose **Create a custom GIF** below the templates. The studio starts with one frame; use **Add another frame** at the end of the timeline to add more. Accept a photo for each frame, then choose **Make GIF** to export.
+
 ## Capture and review frames
 
 1. Line yourself up with the translucent pose guide over the live camera preview.

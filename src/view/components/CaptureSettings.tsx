@@ -3,6 +3,7 @@ import "./CaptureSettings.scss";
 
 export function CaptureSettings(props: {
   aspect: string;
+  originalLabel: string;
   hasFrames: boolean;
   onAspectChange: (aspect: string) => void;
   timer: number;
@@ -37,7 +38,7 @@ export function CaptureSettings(props: {
             disabled={props.hasFrames}
             onChange={(event) => props.onAspectChange(event.target.value)}
           >
-            <option value="original">Template</option>
+            <option value="original">{props.originalLabel}</option>
             <option value="1">1:1</option>
             <option value="0.8">4:5</option>
             <option value="0.5625">9:16</option>

@@ -47,3 +47,19 @@ test('layer opacity defaults and controls use only display-ready layer inputs', 
     await server.close()
   }
 })
+
+test('custom capture starts with one frame, no pose guide, and an add-frame control', async () => {
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true } })
+  try {
+    const { Capture } = await server.ssrLoadModule('/src/view/Capture.tsx')
+    const template = { id: 'custom', title: 'Custom GIF', description: '', preview: '', duration: 250, width: 720, height: 720, guideWidth: 0, guideHeight: 0, guides: [] }
+    const render = item => renderToStaticMarkup(createElement(Capture, { template: item, stream: null, onClose() {} }))
+    const html = render(template)
+    assert.match(html, /aria-label="Frame 1"/)
+    assert.doesNotMatch(html, /aria-label="Frame 2"|Pose guide|Make GIF/)
+    assert.match(html, /aria-label="Add another frame"/)
+    assert.doesNotMatch(render({ ...template, guides: ['/guide.png'] }), /aria-label="Add another frame"/)
+  } finally {
+    await server.close()
+  }
+})

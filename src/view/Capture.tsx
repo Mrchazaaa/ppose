@@ -59,6 +59,7 @@ export function Capture(props: {
           </button>
           <CaptureSettings
             aspect={settings.aspect}
+            originalLabel={photos.custom ? "Square (default)" : "Template"}
             hasFrames={settings.hasFrames}
             onAspectChange={settings.setAspect}
             timer={settings.timer}
@@ -141,6 +142,10 @@ export function Capture(props: {
               >
                 <span />
               </button>
+            ) : photos.custom && photos.completed === photos.frames.length ? (
+              <button className="button primary" type="button" disabled={busy} onClick={photos.makeGif}>
+                Make GIF
+              </button>
             ) : (
               <button
                 className="button primary"
@@ -148,7 +153,7 @@ export function Capture(props: {
                 disabled={busy}
                 onClick={photos.accept}
               >
-                {photos.completed === photos.frames.length - 1 &&
+                {!photos.custom && photos.completed === photos.frames.length - 1 &&
                 !photos.current?.accepted
                   ? "Make GIF"
                   : "Accept"}
@@ -237,6 +242,7 @@ export function Capture(props: {
               overlayIndex={photos.overlayIndex}
               onSelect={photos.select}
               onToggleOverlay={photos.toggleOverlay}
+              onAdd={photos.custom ? photos.addFrame : undefined}
             />
           </div>
         </div>

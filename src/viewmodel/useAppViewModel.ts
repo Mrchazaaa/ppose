@@ -3,6 +3,11 @@ import { loadTemplates, outputTemplate, type Template } from '../model/templates
 
 type Session = { template: Template; stream: MediaStream | null }
 
+const customTemplate: Template = {
+  id: 'custom', title: 'Custom GIF', description: '', preview: '',
+  duration: 250, width: 720, height: 720, guideWidth: 0, guideHeight: 0, guides: [],
+}
+
 export function useAppViewModel() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,5 +43,5 @@ export function useAppViewModel() {
     setStarting(false)
   }
 
-  return { templates, loading, camera, error, session, starting, start, close: () => setSession(null) }
+  return { templates, loading, camera, error, session, starting, start, startCustom: () => start(customTemplate), close: () => setSession(null) }
 }
