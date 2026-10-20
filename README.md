@@ -1,5 +1,8 @@
 # ppose
 
+[![Build](https://github.com/Mrchazaaa/ppose/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Mrchazaaa/ppose/actions/workflows/build.yml)
+[![Tests](https://github.com/Mrchazaaa/ppose/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Mrchazaaa/ppose/actions/workflows/test.yml)
+
 Make a transparent animated GIF of yourself, entirely in your browser.
 
 ## Run locally
@@ -13,12 +16,6 @@ To use the camera on a phone while testing locally:
 3. On the phone, open `https://YOUR_LAN_IP:5173/` in its browser. The exact IP supplied in step 1 must match the address in the URL. If the browser reports a certificate warning, check that the CA is trusted before using the camera.
 
 The `.cert/` directory is generated locally and git-ignored. Run `npm run build` to type-check and build.
-
-## Deploy to Netlify
-
-In Netlify, choose **Add new project → Import an existing project**, connect this GitHub repository, and select the `master` branch. `netlify.toml` runs the tests and production build, then publishes `dist/`. Once connected, pushes to `master` deploy automatically; pull requests get deploy previews. Netlify supplies HTTPS, so cameras work without the local certificate.
-
-Select a template, line up with each guide, take a photo immediately or after a 3/5/10-second timer, and accept or retake it. Click earlier frames to review or replace them. When all frames are accepted, make and download your GIF with the original photo backgrounds. Photos are held only in memory until you exit; no photos are uploaded.
 
 ## Add a template
 
