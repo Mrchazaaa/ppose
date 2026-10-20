@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { loadTemplates, type Template } from '../model/templates'
 
-type Session = { template: Template; stream: MediaStream }
+type Session = { template: Template; stream: MediaStream | null }
 
 export function useAppViewModel() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
-  const [camera, setCamera] = useState<'available' | 'unavailable' | 'insecure'>(() =>
-    !window.isSecureContext ? 'insecure' : navigator.mediaDevices ? 'available' : 'unavailable')
+  const camera = !window.isSecureContext ? 'insecure' : navigator.mediaDevices ? 'available' : 'unavailable'
   const [error, setError] = useState('')
   const [session, setSession] = useState<Session | null>(null)
   const [starting, setStarting] = useState(false)
@@ -20,24 +19,22 @@ export function useAppViewModel() {
 
   useEffect(() => {
     if (!session) return
-    return () => session.stream.getTracks().forEach(track => track.stop())
+    return () => session.stream?.getTracks().forEach(track => track.stop())
   }, [session])
 
   async function start(template: Template) {
     setStarting(true)
     setError('')
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false, video: { facingMode: 'user', width: { ideal: template.width }, height: { ideal: template.height } },
-      })
-      setSession({ template, stream })
-      setCamera('available')
-    } catch (reason) {
-      console.error('Camera unavailable:', reason)
-      if (reason instanceof DOMException && reason.name === 'NotFoundError') {
-        setCamera('unavailable')
-      } else setError('Camera access failed. Check your permissions and try again.')
-    } finally { setStarting(false) }
+    let stream: MediaStream | null = null
+    if (camera === 'available') {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false, video: { facingMode: 'user', width: { ideal: template.width }, height: { ideal: template.height } },
+        })
+      } catch (reason) { console.error('Camera unavailable:', reason) }
+    }
+    setSession({ template, stream })
+    setStarting(false)
   }
 
   return { templates, loading, camera, error, session, starting, start, close: () => setSession(null) }

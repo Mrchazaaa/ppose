@@ -29,20 +29,10 @@ export function Results(props: {
       </header>
       <section className="results-content">
         <div>
-          <span className="eyebrow">THE BIG REVEAL ✳</span>
           <h1>
             You made <em>magic.</em>
           </h1>
-          <p>Your moment, on repeat. Made entirely on your device.</p>
-          {url ? (
-            <a
-              className="button primary download"
-              href={url}
-              download={`${props.template.id}.gif`}
-            >
-              ↓ Download GIF
-            </a>
-          ) : error ? (
+          {error ? (
             <>
               <p className="notice" role="alert">
                 {error}
@@ -51,7 +41,7 @@ export function Results(props: {
                 Try again
               </button>
             </>
-          ) : (
+          ) : !url && (
             <p role="status">
               {stage === "background"
                 ? "Removing backgrounds"
@@ -60,13 +50,24 @@ export function Results(props: {
             </p>
           )}
         </div>
-        <div className="result-preview">
-          {url ? (
-            <img src={url} alt={`Animated GIF of ${props.template.title}`} />
-          ) : (
-            <div className="result-placeholder">✳</div>
+        <div className="result-output">
+          <div className="result-preview">
+            {url ? (
+              <img src={url} alt={`Animated GIF of ${props.template.title}`} />
+            ) : (
+              <div className="result-placeholder">✳</div>
+            )}
+            <span>YOUR LOOP / {props.frames.length} FRAMES</span>
+          </div>
+          {url && (
+            <a
+              className="button primary download"
+              href={url}
+              download={`${props.template.id}.gif`}
+            >
+              ↓ Download GIF
+            </a>
           )}
-          <span>YOUR LOOP / {props.frames.length} FRAMES</span>
         </div>
       </section>
     </main>

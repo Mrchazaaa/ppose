@@ -31,7 +31,7 @@ export function capturePhoto(video: HTMLVideoElement, width: number, height: num
   canvas.width = width
   canvas.height = height
   const context = canvas.getContext('2d')
-  if (!context || !video.videoWidth) throw new Error('Camera is not ready yet')
+  if (!context || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !video.videoWidth || !video.videoHeight) throw new Error('Video is not ready yet')
   const scale = Math.max(width / video.videoWidth, height / video.videoHeight)
   const drawnWidth = video.videoWidth * scale
   const drawnHeight = video.videoHeight * scale
@@ -49,20 +49,29 @@ export function resizeImportedPhoto(placement: { x: number; y: number; width: nu
 export async function captureImportedPhoto(photo: Blob, width: number, height: number, placement: { x: number; y: number; width: number; rotation: number }): Promise<Blob> {
   const image = await createImageBitmap(photo)
   try {
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const context = canvas.getContext('2d')
-    if (!context) throw new Error('Canvas is unavailable')
-    const drawnWidth = width * placement.width / 100
-    const drawnHeight = drawnWidth * image.height / image.width
-    if (placement.rotation) {
-      context.translate(width * placement.x / 100 + drawnWidth / 2, height * placement.y / 100 + drawnHeight / 2)
-      context.rotate(placement.rotation * Math.PI / 180)
-      context.drawImage(image, -drawnWidth / 2, -drawnHeight / 2, drawnWidth, drawnHeight)
-    } else context.drawImage(image, width * placement.x / 100, height * placement.y / 100, drawnWidth, drawnHeight)
-    return await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('Could not capture imported photo')), 'image/png'))
+    return await capturePlacedMedia(image, image.width, image.height, width, height, placement)
   } finally { image.close() }
+}
+
+export function captureImportedVideo(video: HTMLVideoElement, width: number, height: number, placement: { x: number; y: number; width: number; rotation: number }): Promise<Blob> {
+  if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || video.seeking || !video.videoWidth || !video.videoHeight) throw new Error('Video is not ready yet')
+  return capturePlacedMedia(video, video.videoWidth, video.videoHeight, width, height, placement)
+}
+
+function capturePlacedMedia(source: CanvasImageSource, sourceWidth: number, sourceHeight: number, width: number, height: number, placement: { x: number; y: number; width: number; rotation: number }): Promise<Blob> {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  if (!context) throw new Error('Canvas is unavailable')
+  const drawnWidth = width * placement.width / 100
+  const drawnHeight = drawnWidth * sourceHeight / sourceWidth
+  if (placement.rotation) {
+    context.translate(width * placement.x / 100 + drawnWidth / 2, height * placement.y / 100 + drawnHeight / 2)
+    context.rotate(placement.rotation * Math.PI / 180)
+    context.drawImage(source, -drawnWidth / 2, -drawnHeight / 2, drawnWidth, drawnHeight)
+  } else context.drawImage(source, width * placement.x / 100, height * placement.y / 100, drawnWidth, drawnHeight)
+  return new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('Could not capture imported frame')), 'image/png'))
 }
 
 async function pixels(blob: Blob, width: number, height: number, background: string | null): Promise<Uint8ClampedArray> {

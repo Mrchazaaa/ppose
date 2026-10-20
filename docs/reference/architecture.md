@@ -1,6 +1,6 @@
 # Architecture and processing
 
-ppose is a React and TypeScript client-side application. There is no backend: the camera, photos, background removal, GIF encoding, preview, and download all run in the browser.
+ppose is a React and TypeScript client-side application. There is no backend: the camera, imported media, background removal, GIF encoding, preview, and download all run in the browser.
 
 ## App structure
 
@@ -15,8 +15,8 @@ The capture viewmodel coordinates shots and review, selects any frame overlay, a
 
 ## Photo-to-GIF pipeline
 
-1. The menu requests a video-only camera stream when a template starts. If a camera is unavailable or permission is denied, capture cannot begin.
-2. Capture displays a centered pose guide above the live preview. A camera frame is cropped to fill the template's output dimensions; front-facing captures are mirrored to match the preview.
+1. The menu requests a video-only camera stream when a template starts. If a camera is unavailable or permission is denied, the studio still opens for imported images and videos.
+2. Capture displays a centered pose guide above the live preview. A camera frame is cropped to fill the template's output dimensions; front-facing captures are mirrored to match the preview. Imported video uses the browser's video decoder and a position slider; paused frames use the same movable, resizable placement and canvas capture as imported images.
 3. Original photos are kept for review and retakes. Accepting a photo moves to the next frame without processing it. Once all photos are accepted, final processing runs `@imgly/background-removal` locally on each original with the quantized ISNet model. The guide helps positioning; segmentation identifies the person.
 4. Once all frames are processed, `gifenc` converts them in order at the template's configured frame duration. The encoder uses one-bit transparency and produces a GIF `Blob` for preview and download. Failed final processing can be retried from the saved originals.
 5. Leaving the session stops camera tracks and revokes temporary object URLs. GIF export reports progress and can be retried after failure.

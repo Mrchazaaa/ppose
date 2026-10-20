@@ -22,7 +22,11 @@
 }
 .download {
   display: inline-block;
-  margin-top: var(--space-7);
+  margin-top: var(--space-4);
+}
+.result-output {
+  width: 100%;
+  max-width: 480px;
 }
 .result-preview {
   aspect-ratio: 4 / 5;

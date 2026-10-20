@@ -22,7 +22,7 @@ export function App() {
         <a className="brand" href="/" aria-label="ppose home">
           p<span>p</span>ose<span className="brand-dot">.</span>
         </a>
-        <span className="privacy-note">YOUR PHOTOS STAY ON YOUR DEVICE ✳</span>
+        <span className="privacy-note">YOUR MEDIA STAYS ON YOUR DEVICE ✳</span>
       </header>
       <section className="templates" aria-labelledby="templates-heading">
         <div className="section-heading">
@@ -39,7 +39,7 @@ export function App() {
               <TemplateCard
                 key={template.id}
                 template={template}
-                disabled={camera !== "available" || starting}
+                 disabled={starting}
                 onStart={start}
               />
             ))}
@@ -47,13 +47,12 @@ export function App() {
         )}
         {camera === "unavailable" && (
           <p className="notice" role="alert">
-            No camera detected. Connect a camera and refresh to start a
-            template.
+            No camera detected. You can still import photos or videos.
           </p>
         )}
         {camera === "insecure" && (
           <p className="notice" role="alert">
-            Camera access needs a secure address on every device. On the
+            Camera access needs a secure address on every device; imports still work. On the
             computer running ppose, open{" "}
             <a href={`http://localhost:${window.location.port || "5173"}/`}>
               http://localhost:{window.location.port || "5173"}/

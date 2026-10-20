@@ -45,16 +45,18 @@
   object-fit: contain;
   pointer-events: none;
 }
-.imported-photo {
+.imported-media {
   position: absolute;
   cursor: move;
   touch-action: none;
 }
-.imported-photo img {
+.imported-media img,
+.imported-media video {
   display: block;
   width: 100%;
   pointer-events: none;
 }
+.imported-media video { height: auto; }
 .resize-handle {
   position: absolute;
   right: 0;

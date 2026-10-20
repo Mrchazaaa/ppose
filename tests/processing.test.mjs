@@ -14,6 +14,48 @@ test('resizing an imported image keeps its center fixed', async () => {
   } finally { await server.close() }
 })
 
+test('capturing a paused video frame crops to the template and rejects undecoded frames', async () => {
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true } })
+  const oldDocument = globalThis.document
+  const oldMedia = globalThis.HTMLMediaElement
+  const draws = []
+  try {
+    const { capturePhoto } = await server.ssrLoadModule('/src/model/processing.ts')
+    globalThis.HTMLMediaElement = { HAVE_CURRENT_DATA: 2 }
+    globalThis.document = { createElement: () => ({ getContext: () => ({ drawImage: (...args) => draws.push(args), translate() { throw new Error('Imported video must not be mirrored') } }), toBlob: callback => callback(new Blob(['video frame'])) }) }
+    const video = { videoWidth: 800, videoHeight: 400, readyState: 1 }
+    assert.throws(() => capturePhoto(video, 200, 200, false), /not ready/)
+    video.readyState = 2
+    assert.equal(await (await capturePhoto(video, 200, 200, false)).text(), 'video frame')
+    assert.deepEqual(draws[0].slice(1), [-100, 0, 400, 200])
+  } finally {
+    globalThis.document = oldDocument
+    globalThis.HTMLMediaElement = oldMedia
+    await server.close()
+  }
+})
+
+test('imported video capture uses its preview placement instead of the camera crop', async () => {
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, optimizeDeps: { noDiscovery: true } })
+  const oldDocument = globalThis.document
+  const oldMedia = globalThis.HTMLMediaElement
+  const draws = []
+  try {
+    const { captureImportedVideo } = await server.ssrLoadModule('/src/model/processing.ts')
+    globalThis.HTMLMediaElement = { HAVE_CURRENT_DATA: 2 }
+    globalThis.document = { createElement: () => ({ getContext: () => ({ drawImage: (...args) => draws.push(args) }), toBlob: callback => callback(new Blob(['frame'])) }) }
+    const video = { videoWidth: 800, videoHeight: 400, readyState: 2, seeking: false }
+    assert.equal(await (await captureImportedVideo(video, 400, 300, { x: -25, y: 10, width: 150, rotation: 0 })).text(), 'frame')
+    assert.deepEqual(draws[0].slice(1), [-100, 30, 600, 300])
+    video.seeking = true
+    assert.throws(() => captureImportedVideo(video, 400, 300, { x: 0, y: 0, width: 100, rotation: 0 }), /not ready/)
+  } finally {
+    globalThis.document = oldDocument
+    globalThis.HTMLMediaElement = oldMedia
+    await server.close()
+  }
+})
+
 test('final processing removes backgrounds in frame order and can retry after failure', async () => {
   const server = await createServer({ server: { middlewareMode: true }, optimizeDeps: { noDiscovery: true } })
   try {

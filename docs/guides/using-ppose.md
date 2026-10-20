@@ -2,7 +2,7 @@
 
 ## Choose a template
 
-Open the app and choose an animation template from the menu. Starting a template requires a camera and permission to use it. Browser camera access also requires a secure context: use `localhost` on the development computer or trusted HTTPS on another device. If access fails, the app displays an error; see the [local setup instructions](../../README.md#run-locally) for phone testing.
+Open the app and choose an animation template from the menu. You can import images or video without a camera. Camera capture requires permission and a secure context: use `localhost` on the development computer or trusted HTTPS on another device. If camera access fails, you can still use imported media; see the [local setup instructions](../../README.md#run-locally) for phone testing.
 
 ## Capture and review frames
 
@@ -10,6 +10,8 @@ Open the app and choose an animation template from the menu. Starting a template
 2. Take a photo immediately, or select a 3-, 5-, or 10-second timer before pressing the shutter.
 3. Review the shot. Choose **Retake** to replace it, or **Accept photo** to save it and move to the next frame.
 4. Repeat for every frame. Use the frame timeline to revisit an earlier photo and retake it if needed. Check a photographed frame in the timeline to overlay it on the preview; use Capture settings to adjust the camera/photo, frame overlay, and pose guide opacities independently.
+
+To use a video instead, open the **＋** source menu and choose **Import video**. Select a video from your device, drag the Video position slider to a moment you want, then drag the preview (or use arrow keys) to reposition it. Adjust its size or rotation if needed, and press the shutter to capture that moment as a frame. Accept it or retake it, then scrub to another moment for the next frame. You can switch back to the camera or choose **Import image** from the same menu. Video files remain on your device.
 
 After all shots are accepted, the app removes their backgrounds and creates the GIF on your device. If final processing fails, use **Try again** to retry from the original photos. The app saves the session's photos in memory only until you exit. If the camera disconnects, return to the menu and reconnect it.
 

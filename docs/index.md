@@ -1,6 +1,6 @@
 # ppose documentation
 
-ppose is a browser-based app for easily creating looping GIFs. Photos stay on your device; there is no backend or photo upload.
+ppose is a browser-based app for easily creating looping GIFs. Photos and videos stay on your device; there is no backend or media upload.
 
 ## Guides
 

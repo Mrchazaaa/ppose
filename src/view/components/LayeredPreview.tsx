@@ -6,7 +6,7 @@ export function LayeredPreview(props: {
   layers: PreviewLayer[];
   background?: string | null;
   imported?: {
-    url: string;
+    url?: string;
     placement: { x: number; y: number; width: number; rotation: number };
     onMove: (placement: {
       x: number;
@@ -61,27 +61,10 @@ export function LayeredPreview(props: {
       {[...props.layers]
         .sort((a, b) => a.zIndex - b.zIndex)
         .map((layer) =>
-          layer.kind === "video" ? (
-            <video
-              key={layer.id}
-              ref={layer.ref}
-              autoPlay
-              muted
-              playsInline
-              className={layer.className}
-              style={{
-                ...layer.style,
-                zIndex: layer.zIndex,
-                opacity: layer.opacity / 100,
-              }}
-              onPlaying={layer.onReady}
-              onError={layer.onError}
-              aria-label={layer.ariaLabel}
-            />
-          ) : layer.id === "base" && props.imported ? (
+          layer.id === "base" && props.imported ? (
             <div
               key={layer.id}
-              className="imported-photo"
+              className="imported-media"
               style={{
                 left: `${props.imported.placement.x}%`,
                 top: `${props.imported.placement.y}%`,
@@ -108,18 +91,35 @@ export function LayeredPreview(props: {
                 }
               }}
               onPointerDown={(event) => startDrag(event, false)}
-              aria-label="Imported photo: drag or use arrow keys to reposition"
+              aria-label={`Imported ${layer.kind === "video" ? "video" : "photo"}: drag or use arrow keys to reposition`}
             >
-              <img
-                src={props.imported.url}
-                alt=""
-                draggable={false}
-                style={{ opacity: layer.opacity / 100 }}
-              />
+              {layer.kind === "video" ? (
+                <video
+                  ref={layer.ref}
+                  src={layer.src}
+                  muted
+                  playsInline
+                  className={layer.className}
+                  style={{ opacity: layer.opacity / 100 }}
+                  onLoadedData={layer.onReady}
+                  onLoadedMetadata={layer.onMetadata}
+                  onSeeking={layer.onSeeking}
+                  onSeeked={layer.onSeeked}
+                  onError={layer.onError}
+                  aria-label={layer.ariaLabel}
+                />
+              ) : (
+                <img
+                  src={props.imported.url}
+                  alt=""
+                  draggable={false}
+                  style={{ opacity: layer.opacity / 100 }}
+                />
+              )}
               <button
                 type="button"
                 className="resize-handle"
-                aria-label="Resize imported photo with left and right arrow keys"
+                aria-label={`Resize imported ${layer.kind === "video" ? "video" : "photo"} with left and right arrow keys`}
                 onPointerDown={(event) => startDrag(event, true)}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
@@ -133,6 +133,28 @@ export function LayeredPreview(props: {
                 }}
               />
             </div>
+          ) : layer.kind === "video" ? (
+            <video
+              key={layer.id}
+              ref={layer.ref}
+              src={layer.src}
+              autoPlay={layer.autoPlay ?? true}
+              muted
+              playsInline
+              className={layer.className}
+              style={{
+                ...layer.style,
+                zIndex: layer.zIndex,
+                opacity: layer.opacity / 100,
+              }}
+              onPlaying={layer.onReady}
+              onLoadedData={layer.onReady}
+              onLoadedMetadata={layer.onMetadata}
+              onSeeking={layer.onSeeking}
+              onSeeked={layer.onSeeked}
+              onError={layer.onError}
+              aria-label={layer.ariaLabel}
+            />
           ) : (
             layer.url &&
             layer.opacity > 0 && (

@@ -10,13 +10,14 @@ import "./Capture.scss";
 
 export function Capture(props: {
   template: Template;
-  stream: MediaStream;
+  stream: MediaStream | null;
   onClose: () => void;
   process?: ForegroundProcessor;
 }) {
   const { mode, busy, layers, camera, photos, settings, result } =
     useCaptureViewModel(props.template, props.stream);
   const fileInput = useRef<HTMLInputElement>(null);
+  const videoInput = useRef<HTMLInputElement>(null);
   const sourceMenu = useRef<HTMLDetailsElement>(null);
 
   if (mode === "results")
@@ -37,9 +38,9 @@ export function Capture(props: {
           layers={layers}
           background={settings.background}
           imported={
-            mode === "import" && camera.imported
+            (mode === "import" && camera.imported) || (mode === "video" && camera.videoFile)
               ? {
-                  url: camera.imported.url,
+                  url: camera.imported?.url,
                   placement: camera.placement,
                   onMove: camera.setPlacement,
                   onResize: camera.resize,
@@ -78,14 +79,14 @@ export function Capture(props: {
               Check your shot. Accept it or retake it before making your GIF.
             </p>
           )}
-          {mode === "import" && (
+          {(mode === "import" || mode === "video") && (
             <div className="import-tools">
               <label>
                 Size {Math.round(camera.placement.width)}%
                 <input
                   type="range"
                   min="10"
-                  max="300"
+                  max={Math.max(300, Math.ceil(camera.placement.width))}
                   value={camera.placement.width}
                   onChange={(event) =>
                     camera.resize(Number(event.target.value))
@@ -109,17 +110,33 @@ export function Capture(props: {
               </label>
             </div>
           )}
+          {mode === "video" && (
+            <div className="video-tools">
+              <label htmlFor="video-position">Video position</label>
+              <input
+                id="video-position"
+                type="range"
+                min="0"
+                max={camera.videoDuration || 1}
+                step="any"
+                value={camera.videoTime}
+                disabled={!camera.videoDuration}
+                onChange={(event) => camera.seek(Number(event.target.value))}
+              />
+              <span>{camera.videoTime.toFixed(1)}s / {camera.videoDuration.toFixed(1)}s</span>
+            </div>
+          )}
           <div className="capture-controls">
-            {mode === "camera" || mode === "import" ? (
+            {mode === "camera" || mode === "import" || mode === "video" ? (
               <button
                 className="shutter"
                 type="button"
                 disabled={
-                  (mode === "camera" && !camera.ready) ||
+                  ((mode === "camera" || mode === "video") && !camera.ready) ||
                   busy ||
                   camera.countdown > 0
                 }
-                aria-label="Take photo"
+                aria-label={mode === "video" ? "Capture video frame" : "Take photo"}
                 onClick={camera.shoot}
               >
                 <span />
@@ -151,15 +168,15 @@ export function Capture(props: {
           <div className="timeline-controls">
             <details className="source-menu" ref={sourceMenu}>
               <summary
-                aria-label="Choose photo source"
-                title="Choose photo source"
+                aria-label="Choose capture source"
+                title="Choose capture source"
               >
                 ＋
               </summary>
               <div className="source-options">
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || !props.stream}
                   onClick={() => {
                     camera.useCamera();
                     sourceMenu.current!.open = false;
@@ -175,7 +192,17 @@ export function Capture(props: {
                     sourceMenu.current!.open = false;
                   }}
                 >
-                  Select one
+                  Import image
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    videoInput.current?.click();
+                    sourceMenu.current!.open = false;
+                  }}
+                >
+                  Import video
                 </button>
               </div>
             </details>
@@ -188,6 +215,18 @@ export function Capture(props: {
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) void camera.importPhoto(file);
+                event.target.value = "";
+              }}
+            />
+            <input
+              ref={videoInput}
+              type="file"
+              accept="video/*"
+              className="file-input"
+              aria-label="Select video file"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) camera.importVideo(file);
                 event.target.value = "";
               }}
             />
