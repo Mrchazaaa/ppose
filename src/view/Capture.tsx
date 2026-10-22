@@ -1,35 +1,24 @@
 import { useRef } from "react";
-import type { ForegroundProcessor } from "../model/processing";
 import type { Template } from "../model/templates";
 import { LayeredPreview } from "./components/LayeredPreview";
 import { CaptureSettings } from "./components/CaptureSettings";
 import { FrameTimeline } from "./components/FrameTimeline";
 import { useCaptureViewModel } from "../viewmodel/useCaptureViewModel";
-import { Results } from "./Results";
 import "./Capture.scss";
 
 export function Capture(props: {
   template: Template;
   stream: MediaStream | null;
   onClose: () => void;
-  process?: ForegroundProcessor;
+  onFinish: (result: { template: Template; frames: Blob[]; background: string | null }) => void;
 }) {
-  const { mode, busy, layers, camera, photos, settings, result } =
-    useCaptureViewModel(props.template, props.stream);
+  const { mode, busy, layers, camera, photos, settings } =
+    useCaptureViewModel(props.template, props.stream, props.onFinish);
   const fileInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
   const sourceMenu = useRef<HTMLDetailsElement>(null);
 
-  if (mode === "results")
-    return (
-      <Results
-        template={result.template}
-        frames={result.frames}
-        background={result.background}
-        process={props.process}
-        onClose={props.onClose}
-      />
-    );
+  if (mode === "results") return null;
 
   return (
     <main className="studio">
@@ -37,16 +26,6 @@ export function Capture(props: {
         <LayeredPreview
           layers={layers}
           background={settings.background}
-          imported={
-            (mode === "import" && camera.imported) || (mode === "video" && camera.videoFile)
-              ? {
-                  url: camera.imported?.url,
-                  placement: camera.placement,
-                  onMove: camera.setPlacement,
-                  onResize: camera.resize,
-                }
-              : undefined
-          }
         />
         {camera.countdown > 0 && (
           <div className="countdown" aria-live="assertive">
@@ -61,7 +40,8 @@ export function Capture(props: {
             aspect={settings.aspect}
             originalLabel={photos.custom ? "Square (default)" : "Template"}
             hasFrames={settings.hasFrames}
-            onAspectChange={settings.setAspect}
+            canChangeAspect={settings.canChangeAspect}
+            onAspectChange={settings.chooseAspect}
             timer={settings.timer}
             onTimerChange={settings.chooseTimer}
             background={settings.background}
@@ -102,10 +82,7 @@ export function Capture(props: {
                   max="180"
                   value={camera.placement.rotation}
                   onChange={(event) =>
-                    camera.setPlacement({
-                      ...camera.placement,
-                      rotation: Number(event.target.value),
-                    })
+                    camera.rotate(Number(event.target.value))
                   }
                 />
               </label>

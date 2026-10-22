@@ -1,76 +1,28 @@
-import { TemplateCard } from "./components/TemplateCard";
 import { useAppViewModel } from "../viewmodel/useAppViewModel";
 import { Capture } from "./Capture";
-import "./App.scss";
+import { Results } from "./Results";
+import { TemplateMenu } from "./TemplateMenu";
+import { RouteStatus } from "./components/RouteStatus";
 
 export function App() {
-  const { templates, loading, camera, error, session, starting, start, startCustom, close } =
+  const { templates, loading, session, result, starting, route, studio, start, startCustom, close, finish } =
     useAppViewModel();
 
-  if (session)
+  if (route.kind === "results")
+    return <Results template={result!.template} frames={result!.frames} background={result!.background} onClose={close} />;
+
+  if (route.kind === "studio")
     return (
       <Capture
-        template={session.template}
-        stream={session.stream}
+        template={session!.template}
+        stream={session!.stream}
         onClose={close}
+        onFinish={finish}
       />
     );
 
-  return (
-    <main className="menu shell">
-      <header className="masthead">
-        <a className="brand" href="/" aria-label="ppose home">
-          p<span>p</span>ose<span className="brand-dot">.</span>
-        </a>
-        <span className="privacy-note">YOUR MEDIA STAYS ON YOUR DEVICE ✳</span>
-      </header>
-      <section className="templates" aria-labelledby="templates-heading">
-        <div className="section-heading">
-          <h1 id="templates-heading">Templates</h1>
-          <span className="section-note">More poses coming soon ↗</span>
-        </div>
-        {loading ? (
-          <p>Loading templates…</p>
-        ) : templates.length === 0 ? (
-          <p>No valid templates found. Check the console for details.</p>
-        ) : (
-          <div className="template-grid">
-            {templates.map((template) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                 disabled={starting}
-                onStart={start}
-              />
-            ))}
-          </div>
-        )}
-        {camera === "unavailable" && (
-          <p className="notice" role="alert">
-            No camera detected. You can still import photos or videos.
-          </p>
-        )}
-        {camera === "insecure" && (
-          <p className="notice" role="alert">
-            Camera access needs a secure address on every device; imports still work. On the
-            computer running ppose, open{" "}
-            <a href={`http://localhost:${window.location.port || "5173"}/`}>
-              http://localhost:{window.location.port || "5173"}/
-            </a>
-            . On other devices, use trusted HTTPS.
-          </p>
-        )}
-        {error && (
-          <p className="notice" role="alert">
-            {error}
-          </p>
-        )}
-      </section>
-      <section className="custom-gif" aria-label="Create without a template">
-        <button className="button secondary" type="button" disabled={starting} onClick={startCustom}>
-          ＋ Create a custom GIF
-        </button>
-      </section>
-    </main>
-  );
+  if (route.kind === "menu")
+    return <TemplateMenu templates={templates} loading={loading} starting={starting} onStart={start} onStartCustom={startCustom} />;
+
+  return <RouteStatus status={route.kind === "studio" && (loading || studio) ? "opening" : route.kind === "results" ? "results-unavailable" : "studio-not-found"} onClose={close} />;
 }

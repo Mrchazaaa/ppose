@@ -3,6 +3,7 @@
 ## Choose a template
 
 Open the app and choose an animation template from the menu. You can import images or video without a camera. Camera capture requires permission and a secure context: use `localhost` on the development computer or trusted HTTPS on another device. If camera access fails, you can still use imported media; see the [local setup instructions](../../README.md#run-locally) for phone testing.
+You can share a template's studio URL (`/capture/<template-id>`) or open `/capture/custom` for a guide-free session. A direct visit or refresh starts a new session; photos and GIFs from an earlier session are not stored in the URL. Browser Back and Forward navigate between the menu and studio.
 
 To create a GIF without a pose guide, choose **Create a custom GIF** below the templates. The studio starts with one frame; use **Add another frame** at the end of the timeline to add more. Accept a photo for each frame, then choose **Make GIF** to export.
 
@@ -20,6 +21,7 @@ After all shots are accepted, the app removes their backgrounds and creates the 
 ## Make and download the GIF
 
 Once every frame has been accepted, choose **Make my GIF**. The results view shows encoding progress, a looping preview, and a **Download GIF** link. If export fails, choose **Try again**. Close the results view to return to the template menu.
+The results view uses `/results` while the export remains in memory. Opening or refreshing `/results` without that session shows **Results unavailable**. Back from results starts a fresh studio session; the previous export is released.
 
 GIF exports fit within 480×720 pixels while preserving the selected aspect ratio (for example, 480×480 for 1:1, 480×600 for 4:5, and 405×720 for 9:16).
 

@@ -8,7 +8,8 @@
 
   ```tsx
   export function Capture(props: {
-    template: Template; stream: MediaStream; onClose: () => void; process?: ForegroundProcessor
+    template: Template; stream: MediaStream | null; onClose: () => void;
+    onFinish: (result: { template: Template; frames: Blob[]; background: string | null }) => void
   }) {
     // ...
   }

@@ -1,6 +1,7 @@
 # Add a template
 
 Create a folder under `templates/` with a `config.json` and transparent PNG pose guides. Templates are bundled from this folder at build time; no menu code changes are needed.
+The folder name becomes the shareable `/capture/<folder-name>` URL; `custom` is reserved for the guide-free studio.
 
 ```text
 templates/

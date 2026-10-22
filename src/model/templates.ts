@@ -31,6 +31,7 @@ const images = import.meta.glob('../../templates/*/*.{png,jpg,jpeg,webp,gif}', {
 export function parseTemplate(path: string, config: unknown, imageUrls: Record<string, string>): TemplateConfig {
   const data = config as Record<string, unknown>
   const id = path.split('/').at(-2)!
+  if (id === 'custom') throw new Error('custom: reserved for the guide-free studio route')
   if (!data || typeof data.title !== 'string' || !data.title.trim() ||
       typeof data.preview !== 'string' || !data.preview.trim() ||
       typeof data.description !== 'string' || !Number.isInteger(data.duration) ||

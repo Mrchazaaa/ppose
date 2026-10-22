@@ -5,38 +5,29 @@ import "./LayeredPreview.scss";
 export function LayeredPreview(props: {
   layers: PreviewLayer[];
   background?: string | null;
-  imported?: {
-    url?: string;
-    placement: { x: number; y: number; width: number; rotation: number };
-    onMove: (placement: {
-      x: number;
-      y: number;
-      width: number;
-      rotation: number;
-    }) => void;
-    onResize: (width: number) => void;
-  };
 }) {
   const ratio =
     props.layers.find((layer) => layer.aspectRatio !== undefined)
       ?.aspectRatio ?? 1;
-  function startDrag(event: PointerEvent<HTMLElement>, resize: boolean) {
-    if (!props.imported) return;
+  function startDrag(
+    event: PointerEvent<HTMLElement>,
+    manipulation: NonNullable<PreviewLayer["manipulation"]>,
+    resize: boolean,
+  ) {
     event.preventDefault();
     event.stopPropagation();
     const element = event.currentTarget;
     const picture = element.closest(".picture")!;
-    const start = props.imported.placement;
+    const start = manipulation.placement;
     const x = event.clientX;
     const y = event.clientY;
     element.setPointerCapture(event.pointerId);
     element.onpointermove = (move) => {
       const scale = 100 / picture.getBoundingClientRect().width;
       if (resize)
-        props.imported?.onResize(start.width + (move.clientX - x) * scale);
+        manipulation.onResize(start.width + (move.clientX - x) * scale);
       else
-        props.imported?.onMove({
-          ...start,
+        manipulation.onMove({
           x: start.x + (move.clientX - x) * scale,
           y: start.y + (move.clientY - y) * scale,
         });
@@ -61,15 +52,15 @@ export function LayeredPreview(props: {
       {[...props.layers]
         .sort((a, b) => a.zIndex - b.zIndex)
         .map((layer) =>
-          layer.id === "base" && props.imported ? (
+          layer.manipulation ? (
             <div
               key={layer.id}
               className="imported-media"
               style={{
-                left: `${props.imported.placement.x}%`,
-                top: `${props.imported.placement.y}%`,
-                width: `${props.imported.placement.width}%`,
-                transform: `rotate(${props.imported.placement.rotation}deg)`,
+                left: `${layer.manipulation.placement.x}%`,
+                top: `${layer.manipulation.placement.y}%`,
+                width: `${layer.manipulation.placement.width}%`,
+                transform: `rotate(${layer.manipulation.placement.rotation}deg)`,
                 zIndex: layer.zIndex,
               }}
               tabIndex={0}
@@ -83,14 +74,13 @@ export function LayeredPreview(props: {
                 }[event.key];
                 if (delta) {
                   event.preventDefault();
-                  props.imported?.onMove({
-                    ...props.imported.placement,
-                    x: props.imported.placement.x + delta[0],
-                    y: props.imported.placement.y + delta[1],
+                  layer.manipulation?.onMove({
+                    x: layer.manipulation.placement.x + delta[0],
+                    y: layer.manipulation.placement.y + delta[1],
                   });
                 }
               }}
-              onPointerDown={(event) => startDrag(event, false)}
+              onPointerDown={(event) => startDrag(event, layer.manipulation!, false)}
               aria-label={`Imported ${layer.kind === "video" ? "video" : "photo"}: drag or use arrow keys to reposition`}
             >
               {layer.kind === "video" ? (
@@ -100,7 +90,7 @@ export function LayeredPreview(props: {
                   muted
                   playsInline
                   className={layer.className}
-                  style={{ opacity: layer.opacity / 100 }}
+                  style={{ ...layer.style, opacity: layer.opacity / 100 }}
                   onLoadedData={layer.onReady}
                   onLoadedMetadata={layer.onMetadata}
                   onSeeking={layer.onSeeking}
@@ -110,23 +100,24 @@ export function LayeredPreview(props: {
                 />
               ) : (
                 <img
-                  src={props.imported.url}
-                  alt=""
+                  src={layer.url}
+                  alt={layer.alt}
+                  className={layer.className}
                   draggable={false}
-                  style={{ opacity: layer.opacity / 100 }}
+                  style={{ ...layer.style, opacity: layer.opacity / 100 }}
                 />
               )}
               <button
                 type="button"
                 className="resize-handle"
                 aria-label={`Resize imported ${layer.kind === "video" ? "video" : "photo"} with left and right arrow keys`}
-                onPointerDown={(event) => startDrag(event, true)}
+                onPointerDown={(event) => startDrag(event, layer.manipulation!, true)}
                 onKeyDown={(event) => {
                   if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
                     event.preventDefault();
                     event.stopPropagation();
-                    props.imported?.onResize(
-                      props.imported.placement.width +
+                    layer.manipulation?.onResize(
+                      layer.manipulation.placement.width +
                         (event.key === "ArrowRight" ? 2 : -2),
                     );
                   }

@@ -15,3 +15,7 @@ The project started from this sequence. Use it as context when extending or chec
 5. **Polish and verify.** Check camera denial or absence, slow and failed processing, interrupted sessions, retakes, returning to the menu, guide alignment, front-camera mirroring, mobile layout, keyboard access, and performance on intended devices. Photos and model input must remain local.
 
 Run `npm test` for the processing checks and `npm run build` to type-check and build the app. For local camera testing, see the [README](../README.md#run-locally).
+
+For capture integration checks, run `npm run dev` and open `/tests/capture-workflow.html` in Chromium. It reports PASS/FAIL using canvas-generated media (no camera permission required), exercising frame replacement/selection, overlay invalidation, source switching, review/retake, video seeking, placement, acceptance, and resource cleanup.
+
+Open `/tests/routing.html` in Chromium to check studio/results navigation, Back/Forward, unknown paths, and cleanup when a camera request finishes after leaving a studio.

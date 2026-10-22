@@ -5,6 +5,7 @@ export function CaptureSettings(props: {
   aspect: string;
   originalLabel: string;
   hasFrames: boolean;
+  canChangeAspect: boolean;
   onAspectChange: (aspect: string) => void;
   timer: number;
   onTimerChange: (seconds: number) => void;
@@ -35,7 +36,7 @@ export function CaptureSettings(props: {
           Aspect ratio
           <select
             value={props.aspect}
-            disabled={props.hasFrames}
+            disabled={!props.canChangeAspect}
             onChange={(event) => props.onAspectChange(event.target.value)}
           >
             <option value="original">{props.originalLabel}</option>
